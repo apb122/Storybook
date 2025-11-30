@@ -210,9 +210,33 @@ export const useStoryStore = create<RootState>((set) => {
     },
     deleteCharacter: (id: string) => {
       set((state: RootState) => {
+        // Remove from characters list
+        const newCharacters = state.characters.filter((c) => c.id !== id);
+
+        // Remove from other characters' relationships
+        const updatedCharacters = newCharacters.map((c) => ({
+          ...c,
+          relationships: c.relationships.filter((r) => r.characterId !== id),
+        }));
+
+        // Remove from PlotNodes (povCharacterId and involvedCharacterIds)
+        const updatedPlotNodes = state.plotNodes.map((node) => ({
+          ...node,
+          povCharacterId: node.povCharacterId === id ? undefined : node.povCharacterId,
+          involvedCharacterIds: node.involvedCharacterIds?.filter((cid) => cid !== id),
+        }));
+
+        // Remove from Series (sharedCharacterIds)
+        const updatedSeries = state.series.map((s) => ({
+          ...s,
+          sharedCharacterIds: s.sharedCharacterIds?.filter((cid) => cid !== id),
+        }));
+
         const newState = {
           ...state,
-          characters: state.characters.filter((c) => c.id !== id),
+          characters: updatedCharacters,
+          plotNodes: updatedPlotNodes,
+          series: updatedSeries,
         };
         debouncedSave(newState);
         return newState;
@@ -239,9 +263,27 @@ export const useStoryStore = create<RootState>((set) => {
     },
     deleteLocation: (id: string) => {
       set((state: RootState) => {
+        // Remove from locations list
+        const newLocations = state.locations.filter((l) => l.id !== id);
+
+        // Remove from PlotNodes (locationId and involvedLocationIds)
+        const updatedPlotNodes = state.plotNodes.map((node) => ({
+          ...node,
+          locationId: node.locationId === id ? undefined : node.locationId,
+          involvedLocationIds: node.involvedLocationIds?.filter((lid) => lid !== id),
+        }));
+
+        // Remove from Series (sharedLocationIds)
+        const updatedSeries = state.series.map((s) => ({
+          ...s,
+          sharedLocationIds: s.sharedLocationIds?.filter((lid) => lid !== id),
+        }));
+
         const newState = {
           ...state,
-          locations: state.locations.filter((l) => l.id !== id),
+          locations: newLocations,
+          plotNodes: updatedPlotNodes,
+          series: updatedSeries,
         };
         debouncedSave(newState);
         return newState;

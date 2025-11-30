@@ -1,6 +1,9 @@
 import React from 'react';
 import type { Character } from '@/types/story';
 import { Search, Trash2, Plus } from 'lucide-react';
+// @ts-expect-error react-window types are incompatible with module resolution
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 interface CharacterListProps {
   characters: Character[];
@@ -21,6 +24,44 @@ export const CharacterList: React.FC<CharacterListProps> = ({
   searchQuery,
   onSearchChange,
 }) => {
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const char = characters[index];
+    return (
+      <div style={style} className="pr-2">
+        <div
+          onClick={() => onSelect(char.id)}
+          className={`
+            group flex justify-between items-center p-2 rounded-sm cursor-pointer transition-colors text-sm h-full
+            ${selectedId === char.id ? 'bg-sf-text text-sf-bg' : 'hover:bg-sf-surface text-sf-text'}
+          `}
+        >
+          <div className="min-w-0">
+            <div className="font-medium truncate">{char.name}</div>
+            <div
+              className={`text-xs truncate ${selectedId === char.id ? 'text-sf-bg/70' : 'text-sf-text-muted'}`}
+            >
+              {char.role}
+            </div>
+          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(char.id);
+            }}
+            className={`
+              opacity-0 group-hover:opacity-100 p-1 rounded transition-all
+              ${selectedId === char.id ? 'hover:bg-sf-bg/20 text-sf-bg' : 'hover:bg-sf-border text-sf-text-muted hover:text-sf-danger'}
+            `}
+            aria-label="Delete character"
+            title="Delete character"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="flex flex-col h-full border-r border-sf-border pr-6">
       <div className="mb-6 space-y-4">
@@ -51,45 +92,19 @@ export const CharacterList: React.FC<CharacterListProps> = ({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-1 -mr-2 pr-2">
+      <div className="flex-1 -mr-2 pr-2">
         {characters.length === 0 ? (
           <div className="text-center py-8 text-sf-text-muted text-sm">
             <p>No characters found.</p>
           </div>
         ) : (
-          characters.map((char) => (
-            <div
-              key={char.id}
-              onClick={() => onSelect(char.id)}
-              className={`
-                group flex justify-between items-center p-2 rounded-sm cursor-pointer transition-colors text-sm
-                ${selectedId === char.id ? 'bg-sf-text text-sf-bg' : 'hover:bg-sf-surface text-sf-text'}
-              `}
-            >
-              <div className="min-w-0">
-                <div className="font-medium truncate">{char.name}</div>
-                <div
-                  className={`text-xs truncate ${selectedId === char.id ? 'text-sf-bg/70' : 'text-sf-text-muted'}`}
-                >
-                  {char.role}
-                </div>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(char.id);
-                }}
-                className={`
-                  opacity-0 group-hover:opacity-100 p-1 rounded transition-all
-                  ${selectedId === char.id ? 'hover:bg-sf-bg/20 text-sf-bg' : 'hover:bg-sf-border text-sf-text-muted hover:text-sf-danger'}
-                `}
-                aria-label="Delete character"
-                title="Delete character"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          ))
+          <AutoSizer>
+            {({ height, width }: { height: number; width: number }) => (
+              <List height={height} itemCount={characters.length} itemSize={50} width={width}>
+                {Row}
+              </List>
+            )}
+          </AutoSizer>
         )}
       </div>
     </div>

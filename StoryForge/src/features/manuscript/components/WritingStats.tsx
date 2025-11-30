@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useStoryStore } from '@/state/store';
 import { useParams } from 'react-router-dom';
-import { BarChart2, Target, Clock } from 'lucide-react';
+import { BarChart2, Clock } from 'lucide-react';
 
 interface WritingStatsProps {
   className?: string;

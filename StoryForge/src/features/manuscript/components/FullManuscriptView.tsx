@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useStoryStore } from '@/state/store';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { PlotNode } from '@/types';
+import type { PlotNode } from '@/types';
 
 interface FullManuscriptViewProps {
   className?: string;
