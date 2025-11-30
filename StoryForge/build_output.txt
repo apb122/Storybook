@@ -1,0 +1,9 @@
+﻿
+> storyforge@0.0.0 build
+> tsc -b && vite build
+
+src/features/settings/SettingsView.tsx(146,9): error TS6133: 'handleImport' is declared but its value is never read.
+src/features/storyBible/components/ConsistencyMatrix.tsx(4,23): error TS6133: 'Check' is declared but its value is never read.
+src/features/storyBible/components/ConsistencyMatrix.tsx(4,30): error TS6133: 'HelpCircle' is declared but its value is never read.
+src/features/storyBible/components/ConsistencyMatrix.tsx(35,17): error TS2339: Property 'content' does not exist on type 'PlotNode'.
+src/features/storyBible/components/RelationshipManager.tsx(2,15): error TS6196: 'Character' is declared but never used.

@@ -8,8 +8,8 @@
  * - Right sidebar with inspector/AI panel
  */
 
-import { Outlet } from 'react-router-dom'
-import { SidebarNav } from './SidebarNav'
+import { Outlet } from "react-router-dom";
+import { SidebarNav } from "./SidebarNav";
 
 /**
  * AppLayout Component
@@ -24,7 +24,9 @@ export function AppLayout() {
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="px-8 py-4">
           <h1 className="text-2xl font-bold text-gray-900">StoryForge</h1>
-          <p className="text-sm text-gray-500">Professional Story Planning & Creation</p>
+          <p className="text-sm text-gray-500">
+            Professional Story Planning & Creation
+          </p>
         </div>
       </header>
 
@@ -43,15 +45,21 @@ export function AppLayout() {
         {/* Right Sidebar - Inspector/AI Panel */}
         <aside className="w-80 bg-white border-l border-gray-200 shadow-sm overflow-y-auto p-6">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">AI Inspector</h2>
-            <p className="text-sm text-gray-500">Real-time suggestions & analysis</p>
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              AI Inspector
+            </h2>
+            <p className="text-sm text-gray-500">
+              Real-time suggestions & analysis
+            </p>
           </div>
 
           {/* Status Badges */}
           <div className="space-y-3 mb-6">
             <div className="p-3 bg-green-50 rounded-lg border border-green-200">
               <p className="text-sm font-medium text-green-900">✓ Ready</p>
-              <p className="text-xs text-green-700 mt-1">System is online and ready</p>
+              <p className="text-xs text-green-700 mt-1">
+                System is online and ready
+              </p>
             </div>
 
             <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
@@ -64,7 +72,9 @@ export function AppLayout() {
 
           {/* Quick Actions */}
           <div className="border-t border-gray-200 pt-4">
-            <p className="text-xs font-semibold text-gray-600 uppercase mb-3">Quick Actions</p>
+            <p className="text-xs font-semibold text-gray-600 uppercase mb-3">
+              Quick Actions
+            </p>
             <div className="space-y-2">
               <button className="w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition-colors text-left">
                 🔄 Refresh Analysis
@@ -80,5 +90,5 @@ export function AppLayout() {
         </aside>
       </div>
     </div>
-  )
+  );
 }

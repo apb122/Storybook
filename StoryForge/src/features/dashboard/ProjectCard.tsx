@@ -13,7 +13,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({ project }) => {
   const archiveProject = useStoryStore((state) => state.archiveProject);
 
   const handleOpen = () => {
-    navigate(`/project/${project.id}/overview`);
+    navigate(`/app/project/${project.id}/overview`);
   };
 
   const handleDuplicate = (e: React.MouseEvent) => {

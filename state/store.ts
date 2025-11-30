@@ -6,7 +6,7 @@
  * Automatically persists to localStorage with debounced saves.
  */
 
-import { create } from 'zustand'
+import { create } from "zustand";
 import type {
   StoryProject,
   Character,
@@ -16,99 +16,108 @@ import type {
   StoryVariable,
   AiMessage,
   ContinuityIssue,
-} from '@/types'
+} from "@/types";
 import {
   RootState,
   loadStateFromStorage,
   saveStateToStorage,
-} from './persistence'
+} from "./persistence";
 
 /**
  * Action creators for story projects
  */
 interface ProjectActions {
-  addProject: (project: StoryProject) => void
-  updateProject: (id: string, updates: Partial<StoryProject>) => void
-  deleteProject: (id: string) => void
+  addProject: (project: StoryProject) => void;
+  updateProject: (id: string, updates: Partial<StoryProject>) => void;
+  deleteProject: (id: string) => void;
 }
 
 /**
  * Action creators for characters
  */
 interface CharacterActions {
-  addCharacter: (character: Character) => void
-  updateCharacter: (id: string, updates: Partial<Character>) => void
-  deleteCharacter: (id: string) => void
+  addCharacter: (character: Character) => void;
+  updateCharacter: (id: string, updates: Partial<Character>) => void;
+  deleteCharacter: (id: string) => void;
 }
 
 /**
  * Action creators for locations
  */
 interface LocationActions {
-  addLocation: (location: Location) => void
-  updateLocation: (id: string, updates: Partial<Location>) => void
-  deleteLocation: (id: string) => void
+  addLocation: (location: Location) => void;
+  updateLocation: (id: string, updates: Partial<Location>) => void;
+  deleteLocation: (id: string) => void;
 }
 
 /**
  * Action creators for story items
  */
 interface ItemActions {
-  addItem: (item: StoryItem) => void
-  updateItem: (id: string, updates: Partial<StoryItem>) => void
-  deleteItem: (id: string) => void
+  addItem: (item: StoryItem) => void;
+  updateItem: (id: string, updates: Partial<StoryItem>) => void;
+  deleteItem: (id: string) => void;
 }
 
 /**
  * Action creators for plot nodes
  */
 interface PlotNodeActions {
-  addPlotNode: (node: PlotNode) => void
-  updatePlotNode: (id: string, updates: Partial<PlotNode>) => void
-  deletePlotNode: (id: string) => void
+  addPlotNode: (node: PlotNode) => void;
+  updatePlotNode: (id: string, updates: Partial<PlotNode>) => void;
+  deletePlotNode: (id: string) => void;
 }
 
 /**
  * Action creators for story variables
  */
 interface VariableActions {
-  addVariable: (variable: StoryVariable) => void
-  updateVariable: (id: string, updates: Partial<StoryVariable>) => void
-  deleteVariable: (id: string) => void
+  addVariable: (variable: StoryVariable) => void;
+  updateVariable: (id: string, updates: Partial<StoryVariable>) => void;
+  deleteVariable: (id: string) => void;
 }
 
 /**
  * Action creators for AI messages
  */
 interface MessageActions {
-  addMessage: (message: AiMessage) => void
-  deleteMessage: (id: string) => void
-  clearMessages: (projectId: string) => void
+  addMessage: (message: AiMessage) => void;
+  deleteMessage: (id: string) => void;
+  clearMessages: (projectId: string) => void;
 }
 
 /**
  * Action creators for continuity issues
  */
 interface IssueActions {
-  addIssue: (issue: ContinuityIssue) => void
-  updateIssue: (id: string, updates: Partial<ContinuityIssue>) => void
-  deleteIssue: (id: string) => void
-  resolveIssue: (id: string) => void
+  addIssue: (issue: ContinuityIssue) => void;
+  updateIssue: (id: string, updates: Partial<ContinuityIssue>) => void;
+  deleteIssue: (id: string) => void;
+  resolveIssue: (id: string) => void;
 }
 
 /**
  * Action creators for UI state
  */
 interface UIActions {
-  setSelectedProjectId: (id?: string) => void
-  setSelectedEntityId: (id?: string) => void
-  setSelectedPlotNodeId: (id?: string) => void
+  setSelectedProjectId: (id?: string) => void;
+  setSelectedEntityId: (id?: string) => void;
+  setSelectedPlotNodeId: (id?: string) => void;
 }
 
 /**
  * Complete store interface combining state and actions
  */
-type StoryStore = RootState & ProjectActions & CharacterActions & LocationActions & ItemActions & PlotNodeActions & VariableActions & MessageActions & IssueActions & UIActions
+type StoryStore = RootState &
+  ProjectActions &
+  CharacterActions &
+  LocationActions &
+  ItemActions &
+  PlotNodeActions &
+  VariableActions &
+  MessageActions &
+  IssueActions &
+  UIActions;
 
 /**
  * Create the global Zustand store
@@ -124,7 +133,7 @@ type StoryStore = RootState & ProjectActions & CharacterActions & LocationAction
  */
 export const useStoryStore = create<StoryStore>((set) => {
   // Load persisted state
-  const persistedState = loadStateFromStorage()
+  const persistedState = loadStateFromStorage();
 
   return {
     // Initial state (hydrate from localStorage if available)
@@ -151,7 +160,9 @@ export const useStoryStore = create<StoryStore>((set) => {
     updateProject: (id, updates) =>
       set((state) => ({
         projects: state.projects.map((p) =>
-          p.id === id ? { ...p, ...updates, updatedAt: new Date().toISOString() } : p,
+          p.id === id
+            ? { ...p, ...updates, updatedAt: new Date().toISOString() }
+            : p,
         ),
       })),
 
@@ -159,9 +170,10 @@ export const useStoryStore = create<StoryStore>((set) => {
       set((state) => ({
         projects: state.projects.filter((p) => p.id !== id),
         // Clear selection if deleted project was selected
-        ui: state.ui.selectedProjectId === id
-          ? { ...state.ui, selectedProjectId: undefined }
-          : state.ui,
+        ui:
+          state.ui.selectedProjectId === id
+            ? { ...state.ui, selectedProjectId: undefined }
+            : state.ui,
       })),
 
     // ============ Character Actions ============
@@ -180,9 +192,10 @@ export const useStoryStore = create<StoryStore>((set) => {
     deleteCharacter: (id) =>
       set((state) => ({
         characters: state.characters.filter((c) => c.id !== id),
-        ui: state.ui.selectedEntityId === id
-          ? { ...state.ui, selectedEntityId: undefined }
-          : state.ui,
+        ui:
+          state.ui.selectedEntityId === id
+            ? { ...state.ui, selectedEntityId: undefined }
+            : state.ui,
       })),
 
     // ============ Location Actions ============
@@ -201,9 +214,10 @@ export const useStoryStore = create<StoryStore>((set) => {
     deleteLocation: (id) =>
       set((state) => ({
         locations: state.locations.filter((l) => l.id !== id),
-        ui: state.ui.selectedEntityId === id
-          ? { ...state.ui, selectedEntityId: undefined }
-          : state.ui,
+        ui:
+          state.ui.selectedEntityId === id
+            ? { ...state.ui, selectedEntityId: undefined }
+            : state.ui,
       })),
 
     // ============ Item Actions ============
@@ -214,17 +228,16 @@ export const useStoryStore = create<StoryStore>((set) => {
 
     updateItem: (id, updates) =>
       set((state) => ({
-        items: state.items.map((i) =>
-          i.id === id ? { ...i, ...updates } : i,
-        ),
+        items: state.items.map((i) => (i.id === id ? { ...i, ...updates } : i)),
       })),
 
     deleteItem: (id) =>
       set((state) => ({
         items: state.items.filter((i) => i.id !== id),
-        ui: state.ui.selectedEntityId === id
-          ? { ...state.ui, selectedEntityId: undefined }
-          : state.ui,
+        ui:
+          state.ui.selectedEntityId === id
+            ? { ...state.ui, selectedEntityId: undefined }
+            : state.ui,
       })),
 
     // ============ Plot Node Actions ============
@@ -243,9 +256,10 @@ export const useStoryStore = create<StoryStore>((set) => {
     deletePlotNode: (id) =>
       set((state) => ({
         plotNodes: state.plotNodes.filter((n) => n.id !== id),
-        ui: state.ui.selectedPlotNodeId === id
-          ? { ...state.ui, selectedPlotNodeId: undefined }
-          : state.ui,
+        ui:
+          state.ui.selectedPlotNodeId === id
+            ? { ...state.ui, selectedPlotNodeId: undefined }
+            : state.ui,
       })),
 
     // ============ Variable Actions ============
@@ -326,8 +340,8 @@ export const useStoryStore = create<StoryStore>((set) => {
       set((state) => ({
         ui: { ...state.ui, selectedPlotNodeId: id },
       })),
-  }
-})
+  };
+});
 
 // Subscribe to store changes and persist to localStorage
 useStoryStore.subscribe((state) => {
@@ -342,9 +356,9 @@ useStoryStore.subscribe((state) => {
     aiMessages: state.aiMessages,
     continuityIssues: state.continuityIssues,
     ui: state.ui,
-  }
-  saveStateToStorage(dataState as RootState)
-})
+  };
+  saveStateToStorage(dataState as RootState);
+});
 
 /**
  * Selector hooks for common state queries
@@ -352,36 +366,38 @@ useStoryStore.subscribe((state) => {
  */
 
 /** Get all projects for the current workspace */
-export const useProjects = () => useStoryStore((state) => state.projects)
+export const useProjects = () => useStoryStore((state) => state.projects);
 
 /** Get all characters for the current workspace */
-export const useCharacters = () => useStoryStore((state) => state.characters)
+export const useCharacters = () => useStoryStore((state) => state.characters);
 
 /** Get all locations for the current workspace */
-export const useLocations = () => useStoryStore((state) => state.locations)
+export const useLocations = () => useStoryStore((state) => state.locations);
 
 /** Get all story items */
-export const useItems = () => useStoryStore((state) => state.items)
+export const useItems = () => useStoryStore((state) => state.items);
 
 /** Get all plot nodes */
-export const usePlotNodes = () => useStoryStore((state) => state.plotNodes)
+export const usePlotNodes = () => useStoryStore((state) => state.plotNodes);
 
 /** Get UI state (selections) */
-export const useUIState = () => useStoryStore((state) => state.ui)
+export const useUIState = () => useStoryStore((state) => state.ui);
 
 /** Get the currently selected project */
 export const useSelectedProject = () =>
   useStoryStore((state) => {
-    const selectedId = state.ui.selectedProjectId
-    return selectedId ? state.projects.find((p) => p.id === selectedId) : undefined
-  })
+    const selectedId = state.ui.selectedProjectId;
+    return selectedId
+      ? state.projects.find((p) => p.id === selectedId)
+      : undefined;
+  });
 
 /** Get project count for dashboard display */
 export const useProjectCount = () =>
-  useStoryStore((state) => state.projects.length)
+  useStoryStore((state) => state.projects.length);
 
 /** Get character count for a specific project */
 export const useCharacterCountForProject = (projectId: string) =>
-  useStoryStore((state) =>
-    state.characters.filter((c) => c.projectId === projectId).length,
-  )
+  useStoryStore(
+    (state) => state.characters.filter((c) => c.projectId === projectId).length,
+  );

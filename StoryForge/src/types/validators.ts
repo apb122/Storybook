@@ -141,6 +141,8 @@ export const StoryVariableSchema = z.object({
   label: z.string(),
   type: z.enum(['string', 'number', 'boolean', 'enum', 'rule']),
   value: z.string(),
+  status: z.enum(['tentative', 'confirmed', 'locked']),
+  tags: z.array(z.string()),
   sourceIds: z.array(EntityIdSchema).optional(),
   description: z.string().optional(),
   lastUpdated: TimestampSchema,

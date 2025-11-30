@@ -1,68 +1,133 @@
-import { Outlet } from 'react-router-dom';
-import { SidebarNav } from './SidebarNav';
-import { Breadcrumbs } from '../ui/Breadcrumbs';
-import { CommandPalette } from '../ui/CommandPalette';
-import { useState, useEffect } from 'react';
+import React from 'react';
+import { Outlet, NavLink, useParams } from 'react-router-dom';
+import { useAuthStore } from '@/state/authStore';
+import { useStoryStore } from '@/state/store';
+
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export const AppLayout: React.FC = () => {
-  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  useKeyboardShortcuts();
+  const { user, logout } = useAuthStore();
+  const { projectId } = useParams<{ projectId: string }>();
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setIsPaletteOpen(true);
-      }
-    };
+  // Get project name if in a project context
+  const project = useStoryStore((state) =>
+    projectId ? state.projects.find((p) => p.id === projectId) : null
+  );
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  const isProjectContext = !!projectId;
 
   return (
-    <div className="flex h-screen bg-gray-950 text-gray-100 overflow-hidden font-sans">
-      <CommandPalette isOpen={isPaletteOpen} onClose={() => setIsPaletteOpen(false)} />
+    <div className="min-h-screen flex flex-col bg-sf-bg text-sf-text font-sans">
+      {/* Minimal Top Navigation */}
+      <header className="border-b border-sf-border bg-sf-surface sticky top-0 z-50">
+        <div className="sf-container flex items-center justify-between h-14">
+          <div className="flex items-center gap-8">
+            <NavLink
+              to="/app/dashboard"
+              className="text-lg font-semibold tracking-tight hover:opacity-70 transition-opacity"
+            >
+              StoryForge
+            </NavLink>
 
-      {/* Left Sidebar */}
-      <SidebarNav />
+            {/* Primary Navigation */}
+            <nav className="hidden md:flex items-center gap-6 text-sm">
+              <NavLink
+                to="/app/dashboard"
+                className={({ isActive }) =>
+                  `hover:text-sf-text transition-colors ${isActive && !isProjectContext ? 'text-sf-text font-medium' : 'text-sf-text-muted'}`
+                }
+              >
+                Dashboard
+              </NavLink>
+
+              <NavLink
+                to="/app/series"
+                className={({ isActive }) =>
+                  `hover:text-sf-text transition-colors ${isActive && !isProjectContext ? 'text-sf-text font-medium' : 'text-sf-text-muted'}`
+                }
+              >
+                Series
+              </NavLink>
+
+              {isProjectContext && (
+                <>
+                  <span className="text-sf-border">/</span>
+                  <span className="text-sf-text font-medium truncate max-w-[150px]">
+                    {project?.title || 'Project'}
+                  </span>
+                  <div className="flex items-center gap-4 ml-2">
+                    <NavLink
+                      to={`/app/project/${projectId}/overview`}
+                      className={({ isActive }) =>
+                        `hover:text-sf-text transition-colors ${isActive ? 'text-sf-text font-medium underline underline-offset-4 decoration-sf-border' : 'text-sf-text-muted'}`
+                      }
+                    >
+                      Overview
+                    </NavLink>
+                    <NavLink
+                      to={`/app/project/${projectId}/story-bible`}
+                      className={({ isActive }) =>
+                        `hover:text-sf-text transition-colors ${isActive ? 'text-sf-text font-medium underline underline-offset-4 decoration-sf-border' : 'text-sf-text-muted'}`
+                      }
+                    >
+                      Story Bible
+                    </NavLink>
+                    <NavLink
+                      to={`/app/project/${projectId}/plot`}
+                      className={({ isActive }) =>
+                        `hover:text-sf-text transition-colors ${isActive ? 'text-sf-text font-medium underline underline-offset-4 decoration-sf-border' : 'text-sf-text-muted'}`
+                      }
+                    >
+                      Plot
+                    </NavLink>
+                    <NavLink
+                      to={`/app/project/${projectId}/timeline`}
+                      className={({ isActive }) =>
+                        `hover:text-sf-text transition-colors ${isActive ? 'text-sf-text font-medium underline underline-offset-4 decoration-sf-border' : 'text-sf-text-muted'}`
+                      }
+                    >
+                      Timeline
+                    </NavLink>
+                    <NavLink
+                      to={`/app/project/${projectId}/ai-workshop`}
+                      className={({ isActive }) =>
+                        `hover:text-sf-text transition-colors ${isActive ? 'text-sf-text font-medium underline underline-offset-4 decoration-sf-border' : 'text-sf-text-muted'}`
+                      }
+                    >
+                      Workshop
+                    </NavLink>
+                  </div>
+                </>
+              )}
+            </nav>
+          </div>
+
+          <div className="flex items-center gap-4 text-sm">
+            <span className="text-sf-text-muted hidden sm:inline-block">{user?.name}</span>
+            <button
+              onClick={logout}
+              className="text-sf-text-muted hover:text-sf-danger transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Top Header (Optional, can be part of pages or global) */}
-        <header className="h-14 bg-gray-900 border-b border-gray-800 flex items-center px-6 justify-between shrink-0">
-          <div className="flex items-center">
-            <Breadcrumbs />
-          </div>
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setIsPaletteOpen(true)}
-              className="flex items-center text-sm text-gray-400 hover:text-white transition-colors border border-gray-700 rounded px-2 py-1 bg-gray-800"
-            >
-              <span className="mr-2">Search...</span>
-              <kbd className="text-xs bg-gray-700 px-1 rounded">⌘K</kbd>
-            </button>
-            {/* Placeholder for user/settings */}
-            <div className="w-8 h-8 rounded-full bg-gray-700"></div>
-          </div>
-        </header>
-
-        {/* Scrollable Content */}
-        <div className="flex-1 overflow-auto p-6">
+      <main className="flex-1 w-full">
+        <div className="sf-container py-8">
           <Outlet />
         </div>
       </main>
 
-      {/* Right Inspector Panel (Placeholder) */}
-      <aside className="w-72 bg-gray-900 border-l border-gray-800 flex flex-col shrink-0">
-        <div className="p-4 border-b border-gray-800">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">
-            Inspector
-          </h3>
+      {/* Minimal Footer */}
+      <footer className="border-t border-sf-border py-6 mt-auto">
+        <div className="sf-container text-center text-xs text-sf-text-muted">
+          <p>&copy; {new Date().getFullYear()} StoryForge. Minimalist Writing Environment.</p>
         </div>
-        <div className="flex-1 p-4 text-sm text-gray-500">
-          <p>Select an element to view details or use AI tools here.</p>
-        </div>
-      </aside>
+      </footer>
     </div>
   );
 };

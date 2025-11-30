@@ -14,37 +14,37 @@ import type {
   StoryVariable,
   AiMessage,
   ContinuityIssue,
-} from '@/types'
+} from "@/types";
 
 /** Storage key for persisting the entire application state */
-const STORAGE_KEY = 'storyforge_state'
+const STORAGE_KEY = "storyforge_state";
 
 /** Debounce delay in milliseconds to batch rapid saves */
-const DEBOUNCE_DELAY = 1000
+const DEBOUNCE_DELAY = 1000;
 
 /**
  * Root state interface matching the Zustand store structure
  */
 export interface RootState {
-  projects: StoryProject[]
-  characters: Character[]
-  locations: Location[]
-  items: StoryItem[]
-  plotNodes: PlotNode[]
-  variables: StoryVariable[]
-  aiMessages: AiMessage[]
-  continuityIssues: ContinuityIssue[]
+  projects: StoryProject[];
+  characters: Character[];
+  locations: Location[];
+  items: StoryItem[];
+  plotNodes: PlotNode[];
+  variables: StoryVariable[];
+  aiMessages: AiMessage[];
+  continuityIssues: ContinuityIssue[];
   ui: {
-    selectedProjectId?: string
-    selectedEntityId?: string
-    selectedPlotNodeId?: string
-  }
+    selectedProjectId?: string;
+    selectedEntityId?: string;
+    selectedPlotNodeId?: string;
+  };
 }
 
 /**
  * Debounce timer reference for batch saves
  */
-let debounceTimer: ReturnType<typeof setTimeout> | undefined
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
 /**
  * Loads the application state from localStorage
@@ -57,22 +57,22 @@ let debounceTimer: ReturnType<typeof setTimeout> | undefined
  */
 export function loadStateFromStorage(): Partial<RootState> | undefined {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY);
 
     if (!stored) {
-      console.log('[Storage] No existing state found in localStorage')
-      return undefined
+      console.log("[Storage] No existing state found in localStorage");
+      return undefined;
     }
 
-    const parsed = JSON.parse(stored) as Partial<RootState>
-    console.log('[Storage] State loaded successfully from localStorage')
-    return parsed
+    const parsed = JSON.parse(stored) as Partial<RootState>;
+    console.log("[Storage] State loaded successfully from localStorage");
+    return parsed;
   } catch (error) {
     console.error(
-      '[Storage] Failed to load state from localStorage:',
+      "[Storage] Failed to load state from localStorage:",
       error instanceof Error ? error.message : error,
-    )
-    return undefined
+    );
+    return undefined;
   }
 }
 
@@ -86,34 +86,31 @@ export function loadStateFromStorage(): Partial<RootState> | undefined {
  * @param state - Complete application state to persist
  * @param immediate - If true, saves immediately without debouncing
  */
-export function saveStateToStorage(
-  state: RootState,
-  immediate = false,
-): void {
+export function saveStateToStorage(state: RootState, immediate = false): void {
   // Clear any pending save
   if (debounceTimer) {
-    clearTimeout(debounceTimer)
+    clearTimeout(debounceTimer);
   }
 
   const performSave = () => {
     try {
-      const serialized = JSON.stringify(state)
-      localStorage.setItem(STORAGE_KEY, serialized)
-      console.log('[Storage] State saved to localStorage')
+      const serialized = JSON.stringify(state);
+      localStorage.setItem(STORAGE_KEY, serialized);
+      console.log("[Storage] State saved to localStorage");
     } catch (error) {
       // Silently fail - storage might be unavailable in private browsing
       console.warn(
-        '[Storage] Failed to save state:',
+        "[Storage] Failed to save state:",
         error instanceof Error ? error.message : error,
-      )
+      );
     }
-  }
+  };
 
   if (immediate) {
-    performSave()
+    performSave();
   } else {
     // Schedule save with debounce delay
-    debounceTimer = setTimeout(performSave, DEBOUNCE_DELAY)
+    debounceTimer = setTimeout(performSave, DEBOUNCE_DELAY);
   }
 }
 
@@ -124,12 +121,12 @@ export function saveStateToStorage(
  */
 export function clearStoredState(): void {
   try {
-    localStorage.removeItem(STORAGE_KEY)
-    console.log('[Storage] Persisted state cleared from localStorage')
+    localStorage.removeItem(STORAGE_KEY);
+    console.log("[Storage] Persisted state cleared from localStorage");
   } catch (error) {
     console.warn(
-      '[Storage] Failed to clear state:',
+      "[Storage] Failed to clear state:",
       error instanceof Error ? error.message : error,
-    )
+    );
   }
 }

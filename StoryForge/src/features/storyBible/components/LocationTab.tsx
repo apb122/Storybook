@@ -78,10 +78,7 @@ export const LocationTab: React.FC<LocationTabProps> = ({ projectId }) => {
             onSave={handleUpdate}
           />
         ) : (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500 bg-gray-900">
-            <div className="w-16 h-16 mb-4 rounded-full bg-gray-800 flex items-center justify-center">
-              <span className="text-2xl opacity-50">?</span>
-            </div>
+          <div className="flex flex-col items-center justify-center h-full text-sf-text-muted">
             <p className="text-lg font-medium">Select a location or create a new one</p>
           </div>
         )

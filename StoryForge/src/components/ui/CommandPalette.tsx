@@ -7,6 +7,13 @@ interface CommandPaletteProps {
   onClose: () => void;
 }
 
+interface CommandItem {
+  id: string;
+  label: string;
+  type: string;
+  path: string;
+}
+
 export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -21,23 +28,18 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     }
   }, [isOpen]);
 
-  // Reset selection when query changes
-  useEffect(() => {
-    setSelectedIndex(0);
-  }, [query]);
-
   if (!isOpen) return null;
 
-  const actions = [
+  const actions: CommandItem[] = [
     { id: 'dashboard', label: 'Go to Dashboard', type: 'navigation', path: '/' },
     { id: 'settings', label: 'Go to Settings', type: 'navigation', path: '/settings' },
   ];
 
-  const projectActions = projects.map((p) => ({
+  const projectActions: CommandItem[] = projects.map((p) => ({
     id: `project-${p.id}`,
     label: `Open Project: ${p.title}`,
     type: 'project',
-    path: `/project/${p.id}/overview`,
+    path: `/app/project/${p.id}/overview`,
   }));
 
   const allItems = [...actions, ...projectActions].filter((item) =>
@@ -61,7 +63,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
     }
   };
 
-  const handleSelect = (item: any) => {
+  const handleSelect = (item: CommandItem) => {
     navigate(item.path);
     onClose();
     setQuery('');
@@ -101,7 +103,10 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose 
             className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500 text-lg"
             placeholder="Type a command or search..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setSelectedIndex(0);
+            }}
             onKeyDown={handleKeyDown}
           />
           <div className="text-xs text-gray-500 border border-gray-700 rounded px-1.5 py-0.5">

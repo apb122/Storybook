@@ -59,7 +59,69 @@ export interface StoryProject {
     wordCount?: number;
   };
 
+  // Manuscript Configuration
+  manuscriptMode?: ManuscriptMode;
+  manuscriptTarget?: ManuscriptTarget;
+  totalWordCount?: number;
+  lastDraftedAt?: Timestamp;
+
   // Metadata & Versioning
+  metadata?: Metadata;
+  versionHistory?: VersionHistory;
+}
+
+/**
+ * Represents a series grouping multiple story projects into a shared universe.
+ */
+/**
+ * Manuscript editing modes
+ */
+export type ManuscriptMode = 'perScene' | 'singleDocument';
+
+/**
+ * Writing target configuration
+ */
+export interface ManuscriptTarget {
+  targetWords: number;
+  deadline?: Timestamp;
+  projectId: EntityId;
+}
+
+/**
+ * Rich-text content stored as ProseMirror JSON
+ * TipTap uses ProseMirror under the hood
+ */
+export interface ManuscriptContent {
+  type: 'doc';
+  content: Record<string, unknown>[];
+}
+
+export interface ManuscriptSnapshot {
+  id: EntityId;
+  sceneId: EntityId;
+  projectId: EntityId;
+  label: string;
+  content: ManuscriptContent;
+  wordCount: number;
+  createdAt: Timestamp;
+}
+
+export interface Series {
+  id: EntityId;
+  title: string;
+  description?: string;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+
+  // Project Management
+  projectIds: EntityId[];
+
+  // Shared Resources (references to existing entities)
+  sharedCharacterIds?: EntityId[];
+  sharedLocationIds?: EntityId[];
+
+  // Metadata
+  tags?: string[];
   metadata?: Metadata;
   versionHistory?: VersionHistory;
 }
@@ -165,9 +227,28 @@ export interface PlotNode {
   involvedCharacterIds?: EntityId[];
   involvedLocationIds?: EntityId[];
 
+  // Manuscript content (only for type === 'scene')
+  manuscriptContent?: ManuscriptContent;
+  manuscriptText?: string; // serialized from editor (e.g. JSON or markdown)
+  wordCount?: number;
+  lastEditedAt?: string;
+
   // Metadata & Versioning
   metadata?: Metadata;
   versionHistory?: VersionHistory;
+}
+
+/**
+ * Represents a single manuscript document (for single-document mode).
+ */
+export interface ManuscriptDoc {
+  id: EntityId;
+  projectId: EntityId;
+  title: string;
+  content: string; // editor-serialized format
+  wordCount: number;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
 }
 
 /**
@@ -180,6 +261,8 @@ export interface StoryVariable {
   label: string;
   type: 'string' | 'number' | 'boolean' | 'enum' | 'rule';
   value: string;
+  status: 'tentative' | 'confirmed' | 'locked';
+  tags: string[];
   sourceIds?: EntityId[];
   description?: string;
   lastUpdated: Timestamp;
@@ -197,6 +280,25 @@ export interface StoryContextSnapshot {
   keyCharacters: string[];
   currentPlotNodeSummary?: string;
   namedVariables: Record<string, string>;
+}
+
+/**
+ * Represents a comment or annotation on the manuscript.
+ */
+export interface ManuscriptComment {
+  id: EntityId;
+  projectId: EntityId;
+  sceneId: EntityId;
+  content: string;
+  authorId?: EntityId; // 'user' or 'ai' or specific user id
+  createdAt: Timestamp;
+  resolved: boolean;
+  // If linked to specific text selection
+  selectionRange?: {
+    from: number;
+    to: number;
+    text: string;
+  };
 }
 
 /**
@@ -225,4 +327,14 @@ export interface ContinuityIssue {
   createdAt: Timestamp;
   resolved: boolean;
   resolvedAt?: Timestamp;
+}
+
+/**
+ * Represents writing goals and targets for the project.
+ */
+export interface WritingTargets {
+  daily: number;
+  total: number;
+  sessionStartWordCount: number;
+  lastSessionDate: string;
 }

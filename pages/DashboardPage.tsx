@@ -4,17 +4,17 @@
  * Landing page showing projects, recent activity, and quick actions.
  */
 
-import { useNavigate } from 'react-router-dom'
-import { useProjects, useProjectCount } from '@/state'
+import { useNavigate } from "react-router-dom";
+import { useProjects, useProjectCount } from "@/state";
 
 export function DashboardPage() {
-  const navigate = useNavigate()
-  const projects = useProjects()
-  const projectCount = useProjectCount()
+  const navigate = useNavigate();
+  const projects = useProjects();
+  const projectCount = useProjectCount();
 
   const handleOpenProject = (projectId: string) => {
-    navigate(`/project/${projectId}`)
-  }
+    navigate(`/project/${projectId}`);
+  };
 
   return (
     <div className="max-w-6xl mx-auto px-8 py-12">
@@ -23,8 +23,8 @@ export function DashboardPage() {
         <h2 className="text-4xl font-bold text-gray-900 mb-4">Dashboard</h2>
         <p className="text-xl text-gray-600">
           {projectCount === 0
-            ? 'Create your first story project to get started'
-            : `You have ${projectCount} ${projectCount === 1 ? 'project' : 'projects'}`}
+            ? "Create your first story project to get started"
+            : `You have ${projectCount} ${projectCount === 1 ? "project" : "projects"}`}
         </p>
       </div>
 
@@ -38,9 +38,13 @@ export function DashboardPage() {
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{project.title}</h3>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    {project.title}
+                  </h3>
                   {project.subtitle && (
-                    <p className="text-sm text-gray-500 mt-1">{project.subtitle}</p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {project.subtitle}
+                    </p>
                   )}
                 </div>
                 <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
@@ -51,12 +55,16 @@ export function DashboardPage() {
               {project.genre && (
                 <div className="mb-3">
                   <span className="text-xs text-gray-500">Genre: </span>
-                  <span className="text-sm font-medium text-gray-700">{project.genre}</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    {project.genre}
+                  </span>
                 </div>
               )}
 
               {project.logline && (
-                <p className="text-sm text-gray-600 mb-4 italic">"{project.logline}"</p>
+                <p className="text-sm text-gray-600 mb-4 italic">
+                  "{project.logline}"
+                </p>
               )}
 
               <div className="flex gap-2 pt-4 border-t border-gray-200">
@@ -84,31 +92,40 @@ export function DashboardPage() {
 
       {/* Getting Started Section */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-8 border border-blue-200">
-        <h3 className="text-2xl font-bold text-gray-900 mb-4">Getting Started</h3>
+        <h3 className="text-2xl font-bold text-gray-900 mb-4">
+          Getting Started
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
             <div className="text-3xl mb-2">1️⃣</div>
-            <h4 className="font-semibold text-gray-900 mb-2">Create a Project</h4>
+            <h4 className="font-semibold text-gray-900 mb-2">
+              Create a Project
+            </h4>
             <p className="text-sm text-gray-600">
-              Start by creating a new story project and defining your genre, themes, and logline
+              Start by creating a new story project and defining your genre,
+              themes, and logline
             </p>
           </div>
           <div>
             <div className="text-3xl mb-2">2️⃣</div>
-            <h4 className="font-semibold text-gray-900 mb-2">Build Your Bible</h4>
+            <h4 className="font-semibold text-gray-900 mb-2">
+              Build Your Bible
+            </h4>
             <p className="text-sm text-gray-600">
-              Create characters, locations, and items that define your story world
+              Create characters, locations, and items that define your story
+              world
             </p>
           </div>
           <div>
             <div className="text-3xl mb-2">3️⃣</div>
             <h4 className="font-semibold text-gray-900 mb-2">Plan Your Plot</h4>
             <p className="text-sm text-gray-600">
-              Organize your narrative into acts, chapters, and scenes using plot planning tools
+              Organize your narrative into acts, chapters, and scenes using plot
+              planning tools
             </p>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -5,25 +5,25 @@
  * of the StoryForge application.
  */
 
-import { NavLink } from 'react-router-dom'
+import { NavLink } from "react-router-dom";
 
 /**
  * Navigation item configuration
  */
 interface NavItem {
-  label: string
-  path: string
-  icon: string
+  label: string;
+  path: string;
+  icon: string;
 }
 
 const navItems: NavItem[] = [
-  { label: 'Dashboard', path: '/', icon: '📊' },
-  { label: 'Story Bible', path: '#story-bible', icon: '📚' },
-  { label: 'Plot', path: '#plot', icon: '🎬' },
-  { label: 'Timeline', path: '#timeline', icon: '📅' },
-  { label: 'AI Workshop', path: '#ai-workshop', icon: '🤖' },
-  { label: 'Exports', path: '#exports', icon: '📤' },
-]
+  { label: "Dashboard", path: "/", icon: "📊" },
+  { label: "Story Bible", path: "#story-bible", icon: "📚" },
+  { label: "Plot", path: "#plot", icon: "🎬" },
+  { label: "Timeline", path: "#timeline", icon: "📅" },
+  { label: "AI Workshop", path: "#ai-workshop", icon: "🤖" },
+  { label: "Exports", path: "#exports", icon: "📤" },
+];
 
 /**
  * SidebarNav Component
@@ -51,8 +51,8 @@ export function SidebarNav() {
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition-colors ${
                     isActive
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-100'
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-700 hover:bg-gray-100"
                   }`
                 }
               >
@@ -71,5 +71,5 @@ export function SidebarNav() {
         </button>
       </div>
     </nav>
-  )
+  );
 }

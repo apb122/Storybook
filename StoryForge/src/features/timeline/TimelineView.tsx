@@ -3,6 +3,7 @@ import { useStoryStore } from '@/state/store';
 import { SplitView } from '@/components/ui/SplitView';
 import { getApiKey, generateAiResponse, type AiRequestPayload } from '@/services/aiService';
 import { buildStoryContextSnapshot } from '@/utils/buildStoryContextSnapshot';
+import { Filter, User, MapPin, CheckCircle } from 'lucide-react';
 
 interface TimelineViewProps {
   projectId: string;
@@ -121,16 +122,18 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
   };
 
   const Sidebar = (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full border-r border-sf-border pr-6">
       {/* Filters */}
-      <div className="p-4 border-b border-gray-700 space-y-3 bg-gray-900/50">
-        <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider">Filters</h3>
-        <div className="grid grid-cols-2 gap-2">
+      <div className="mb-6 space-y-4">
+        <h3 className="text-lg font-bold text-sf-text flex items-center gap-2">
+          <Filter size={18} /> Timeline
+        </h3>
+        <div className="space-y-2">
           <select
             title="Filter by Character"
             value={filterCharacterId}
             onChange={(e) => setFilterCharacterId(e.target.value)}
-            className="bg-gray-800 border border-gray-600 text-sm rounded px-2 py-1 text-white focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-transparent border border-sf-border rounded-sm px-2 py-1.5 text-sm text-sf-text focus:border-sf-text outline-none"
           >
             <option value="">All Characters</option>
             {projectCharacters.map((c) => (
@@ -143,7 +146,7 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
             title="Filter by Location"
             value={filterLocationId}
             onChange={(e) => setFilterLocationId(e.target.value)}
-            className="bg-gray-800 border border-gray-600 text-sm rounded px-2 py-1 text-white focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-transparent border border-sf-border rounded-sm px-2 py-1.5 text-sm text-sf-text focus:border-sf-text outline-none"
           >
             <option value="">All Locations</option>
             {projectLocations.map((l) => (
@@ -156,9 +159,9 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
       </div>
 
       {/* Scene List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto space-y-1 -mr-2 pr-2">
         {scenes.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-sm">
+          <div className="text-center py-8 text-sf-text-muted text-sm">
             No scenes found matching filters.
           </div>
         ) : (
@@ -170,11 +173,14 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
               <div
                 key={scene.id}
                 onClick={() => setSelectedNodeId(scene.id)}
-                className={`p-3 rounded-md cursor-pointer border transition-all ${
-                  selectedNodeId === scene.id
-                    ? 'bg-indigo-900/40 border-indigo-500/50 shadow-sm'
-                    : 'bg-gray-800/40 border-transparent hover:bg-gray-800 hover:border-gray-700'
-                }`}
+                className={`
+                  p-3 rounded-sm cursor-pointer border transition-all
+                  ${
+                    selectedNodeId === scene.id
+                      ? 'bg-sf-surface border-sf-text'
+                      : 'bg-transparent border-sf-border hover:border-sf-text-muted'
+                  }
+                `}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <input
@@ -183,30 +189,26 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => handleTimelinePositionChange(scene.id, e.target.value)}
                     placeholder="Time..."
-                    className="w-20 bg-gray-900 border border-gray-700 rounded px-1.5 py-0.5 text-xs text-indigo-300 placeholder-gray-600 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                    className="w-20 bg-transparent border-b border-sf-border px-0 py-0.5 text-xs text-sf-accent placeholder-sf-text-muted focus:border-sf-accent outline-none"
                   />
-                  <h4 className="flex-1 font-medium text-gray-200 text-sm truncate">
-                    {scene.title}
-                  </h4>
+                  <h4 className="flex-1 font-bold text-sf-text text-sm truncate">{scene.title}</h4>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mb-1.5">
+                <div className="flex flex-wrap gap-2 mb-2">
                   {povChar && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-900/30 text-blue-300 border border-blue-800/30">
-                      👤 {povChar.name}
+                    <span className="flex items-center gap-1 text-[10px] text-sf-text-muted uppercase tracking-wider">
+                      <User size={10} /> {povChar.name}
                     </span>
                   )}
                   {loc && (
-                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-900/30 text-emerald-300 border border-emerald-800/30">
-                      📍 {loc.name}
+                    <span className="flex items-center gap-1 text-[10px] text-sf-text-muted uppercase tracking-wider">
+                      <MapPin size={10} /> {loc.name}
                     </span>
                   )}
                 </div>
 
                 {scene.summary && (
-                  <p className="text-xs text-gray-500 line-clamp-2 pl-1 border-l-2 border-gray-700">
-                    {scene.summary}
-                  </p>
+                  <p className="text-xs text-sf-text-muted line-clamp-2">{scene.summary}</p>
                 )}
               </div>
             );
@@ -217,73 +219,85 @@ export const TimelineView: React.FC<TimelineViewProps> = ({ projectId }) => {
   );
 
   const DetailPane = selectedNode ? (
-    <div className="flex flex-col h-full">
-      <div className="p-6 border-b border-gray-700 flex justify-between items-start">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex justify-between items-start mb-6 pb-4 border-b border-sf-border">
         <div>
-          <h2 className="text-xl font-bold text-white mb-1">{selectedNode.title}</h2>
-          <div className="text-sm text-gray-400 flex gap-4">
+          <h2 className="text-2xl font-bold text-sf-text mb-1">{selectedNode.title}</h2>
+          <div className="text-sm text-sf-text-muted flex gap-4">
             <span>
               Position:{' '}
-              <span className="text-indigo-400">{selectedNode.timelinePosition || 'Unset'}</span>
+              <span className="text-sf-accent">{selectedNode.timelinePosition || 'Unset'}</span>
             </span>
           </div>
         </div>
         <button
           onClick={handleCheckContinuity}
           disabled={isCheckingContinuity}
-          className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 disabled:opacity-50 transition-colors flex items-center gap-2"
+          className="btn-secondary text-xs flex items-center gap-2"
         >
-          {isCheckingContinuity ? 'Checking...' : 'Check Continuity'}
+          {isCheckingContinuity ? (
+            'Checking...'
+          ) : (
+            <>
+              <CheckCircle size={14} /> Check Continuity
+            </>
+          )}
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <div className="grid grid-cols-1 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Goals</label>
-            <textarea
-              value={selectedNode.goals || ''}
-              onChange={(e) => updatePlotNode(selectedNode.id, { goals: e.target.value })}
-              rows={2}
-              className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500"
-              placeholder="What does the character want?"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Conflict</label>
-            <textarea
-              value={selectedNode.conflict || ''}
-              onChange={(e) => updatePlotNode(selectedNode.id, { conflict: e.target.value })}
-              rows={2}
-              className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500"
-              placeholder="What stands in their way?"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Outcome</label>
-            <textarea
-              value={selectedNode.outcome || ''}
-              onChange={(e) => updatePlotNode(selectedNode.id, { outcome: e.target.value })}
-              rows={2}
-              className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500"
-              placeholder="How does it end?"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Notes</label>
-            <textarea
-              value={selectedNode.notes || ''}
-              onChange={(e) => updatePlotNode(selectedNode.id, { notes: e.target.value })}
-              rows={4}
-              className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500"
-              placeholder="Additional notes..."
-            />
-          </div>
-        </div>
+      <div className="flex-1 overflow-y-auto pr-2 space-y-8">
+        <section>
+          <label className="block text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2">
+            Goals
+          </label>
+          <textarea
+            value={selectedNode.goals || ''}
+            onChange={(e) => updatePlotNode(selectedNode.id, { goals: e.target.value })}
+            rows={2}
+            className="w-full resize-none"
+            placeholder="What does the character want?"
+          />
+        </section>
+        <section>
+          <label className="block text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2">
+            Conflict
+          </label>
+          <textarea
+            value={selectedNode.conflict || ''}
+            onChange={(e) => updatePlotNode(selectedNode.id, { conflict: e.target.value })}
+            rows={2}
+            className="w-full resize-none"
+            placeholder="What stands in their way?"
+          />
+        </section>
+        <section>
+          <label className="block text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2">
+            Outcome
+          </label>
+          <textarea
+            value={selectedNode.outcome || ''}
+            onChange={(e) => updatePlotNode(selectedNode.id, { outcome: e.target.value })}
+            rows={2}
+            className="w-full resize-none"
+            placeholder="How does it end?"
+          />
+        </section>
+        <section>
+          <label className="block text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2">
+            Notes
+          </label>
+          <textarea
+            value={selectedNode.notes || ''}
+            onChange={(e) => updatePlotNode(selectedNode.id, { notes: e.target.value })}
+            rows={4}
+            className="w-full"
+            placeholder="Additional notes..."
+          />
+        </section>
       </div>
     </div>
   ) : (
-    <div className="flex flex-col items-center justify-center h-full text-gray-500">
+    <div className="flex flex-col items-center justify-center h-full text-sf-text-muted">
       <p className="text-lg font-medium">Select a scene to view details</p>
     </div>
   );

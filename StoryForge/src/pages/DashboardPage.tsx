@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useStoryStore } from '@/state/store';
 import { ProjectCard } from '@/features/dashboard/ProjectCard';
 import { CreateProjectModal } from '@/features/dashboard/CreateProjectModal';
+import { Search, Plus, Filter } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const projects = useStoryStore((state) => state.projects);
@@ -12,7 +13,7 @@ export const DashboardPage: React.FC = () => {
 
   const filteredProjects = useMemo(() => {
     return projects
-      .filter((p) => !p.isArchived) // Hide archived by default
+      .filter((p) => !p.isArchived)
       .filter((p) => {
         const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
@@ -22,51 +23,54 @@ export const DashboardPage: React.FC = () => {
   }, [projects, searchQuery, statusFilter]);
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-4xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12 border-b border-sf-border pb-6">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">My Projects</h1>
-          <p className="text-gray-400">Manage your stories and creative worlds</p>
+          <h1 className="text-3xl font-bold text-sf-text mb-2">Projects</h1>
+          <p className="text-sf-text-muted">Manage your stories and creative worlds.</p>
         </div>
         <button
           onClick={() => setIsNewProjectModalOpen(true)}
-          className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition-colors flex items-center"
+          className="btn-primary flex items-center gap-2"
         >
-          <span className="mr-2">+</span> New Project
+          <Plus size={16} /> New Project
         </button>
       </div>
 
-      <div className="flex space-x-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-sf-text-muted w-4 h-4" />
           <input
             type="text"
             placeholder="Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-gray-900 border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+            className="w-full pl-10 pr-4 py-2 bg-transparent border-b border-sf-border focus:border-sf-text transition-colors outline-none text-sf-text placeholder:text-sf-text-muted"
+            aria-label="Search projects"
           />
         </div>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          title="Filter by status"
-          className="bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
-        >
-          <option value="all">All Statuses</option>
-          <option value="planning">Planning</option>
-          <option value="drafting">Drafting</option>
-          <option value="revising">Revising</option>
-          <option value="completed">Completed</option>
-          <option value="on_hold">On Hold</option>
-        </select>
+        <div className="relative w-full md:w-48">
+          <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-sf-text-muted w-4 h-4" />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-transparent border-b border-sf-border focus:border-sf-text transition-colors outline-none text-sf-text appearance-none cursor-pointer"
+            aria-label="Filter by status"
+          >
+            <option value="all">All Statuses</option>
+            <option value="planning">Planning</option>
+            <option value="drafting">Drafting</option>
+            <option value="revising">Revising</option>
+            <option value="completed">Completed</option>
+            <option value="on_hold">On Hold</option>
+          </select>
+        </div>
       </div>
 
       {filteredProjects.length === 0 ? (
-        <div className="text-center py-20 bg-gray-900/50 rounded-xl border border-gray-800 border-dashed">
-          <div className="text-6xl mb-4">📝</div>
-          <h3 className="text-xl font-medium text-white mb-2">No projects found</h3>
-          <p className="text-gray-400 mb-6">
+        <div className="text-center py-24 border border-dashed border-sf-border rounded-sm">
+          <h3 className="text-lg font-medium text-sf-text mb-2">No projects found</h3>
+          <p className="text-sf-text-muted mb-6">
             {searchQuery || statusFilter !== 'all'
               ? 'Try adjusting your search or filters'
               : 'Get started by creating your first story project'}
@@ -77,21 +81,18 @@ export const DashboardPage: React.FC = () => {
                 setSearchQuery('');
                 setStatusFilter('all');
               }}
-              className="text-indigo-400 hover:text-indigo-300"
+              className="text-sf-accent hover:text-sf-text underline underline-offset-4"
             >
               Clear filters
             </button>
           ) : (
-            <button
-              onClick={() => setIsNewProjectModalOpen(true)}
-              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg transition-colors"
-            >
+            <button onClick={() => setIsNewProjectModalOpen(true)} className="btn-secondary">
               Create Project
             </button>
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-1">
           {filteredProjects.map((project) => (
             <ProjectCard key={project.id} project={project} />
           ))}

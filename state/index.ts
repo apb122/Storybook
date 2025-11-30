@@ -19,8 +19,12 @@ export {
   useSelectedProject,
   useProjectCount,
   useCharacterCountForProject,
-} from './store'
+} from "./store";
 
-export { loadStateFromStorage, saveStateToStorage, clearStoredState } from './persistence'
+export {
+  loadStateFromStorage,
+  saveStateToStorage,
+  clearStoredState,
+} from "./persistence";
 
-export type { RootState } from './persistence'
+export type { RootState } from "./persistence";

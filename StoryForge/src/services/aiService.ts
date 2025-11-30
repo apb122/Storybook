@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { StoryContextSnapshot, StoryVariable, ContinuityIssue } from '@/types';
+import { generateId } from '@/utils/ids';
 
 export interface AiRequestPayload {
   projectId: string;
@@ -58,7 +59,7 @@ export async function generateAiResponse(payload: AiRequestPayload): Promise<AiR
     if (payload.mode === 'continuity') {
       responseData.suggestedIssues = [
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           projectId: payload.projectId,
           type: 'logic',
           description: 'Potential timeline inconsistency: The hero is in two places at once.',
@@ -68,7 +69,7 @@ export async function generateAiResponse(payload: AiRequestPayload): Promise<AiR
           suggestedFix: 'Check the travel time between locations.',
         },
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           projectId: payload.projectId,
           type: 'character',
           description: 'Character voice mismatch in dialogue.',
@@ -82,7 +83,7 @@ export async function generateAiResponse(payload: AiRequestPayload): Promise<AiR
     if (payload.mode === 'brainstorm') {
       responseData.suggestedVariables = [
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           projectId: payload.projectId,
           key: 'mystery_level',
           label: 'Mystery Level',
@@ -90,9 +91,11 @@ export async function generateAiResponse(payload: AiRequestPayload): Promise<AiR
           value: '1',
           description: 'Tracks the current level of mystery in the story.',
           lastUpdated: new Date().toISOString(),
+          status: 'tentative',
+          tags: [],
         },
         {
-          id: crypto.randomUUID(),
+          id: generateId(),
           projectId: payload.projectId,
           key: 'hero_trust',
           label: 'Hero Trust',
@@ -100,6 +103,8 @@ export async function generateAiResponse(payload: AiRequestPayload): Promise<AiR
           value: '50',
           description: 'How much the hero trusts their companion.',
           lastUpdated: new Date().toISOString(),
+          status: 'tentative',
+          tags: [],
         },
       ];
     }

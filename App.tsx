@@ -1,8 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { AppLayout } from './components/layout/AppLayout'
-import { DashboardPage } from './pages/DashboardPage'
-import { ProjectWorkspacePage } from './pages/ProjectWorkspacePage'
-import './index.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AppLayout } from "./components/layout/AppLayout";
+import { DashboardPage } from "./pages/DashboardPage";
+import { ProjectWorkspacePage } from "./pages/ProjectWorkspacePage";
+import "./index.css";
 
 /**
  * Root application component
@@ -18,5 +18,5 @@ export function App(): JSX.Element {
         </Route>
       </Routes>
     </BrowserRouter>
-  )
+  );
 }

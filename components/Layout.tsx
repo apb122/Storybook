@@ -5,11 +5,11 @@
  * - Right sidebar: AI/Inspector placeholder
  */
 
-import { useProjectCount } from '@/state'
+import { useProjectCount } from "@/state";
 
 export function Layout() {
   // Get project count from Zustand store
-  const projectCount = useProjectCount()
+  const projectCount = useProjectCount();
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -20,7 +20,7 @@ export function Layout() {
           <p className="text-sm text-gray-500 mt-1">Story Creation Tool</p>
           <div className="mt-3 px-3 py-2 bg-blue-50 rounded-lg">
             <p className="text-xs font-semibold text-blue-900">
-              {projectCount} {projectCount === 1 ? 'Project' : 'Projects'}
+              {projectCount} {projectCount === 1 ? "Project" : "Projects"}
             </p>
           </div>
         </div>
@@ -73,7 +73,8 @@ export function Layout() {
                 AI-Powered Writing
               </h3>
               <p className="text-gray-600">
-                Get intelligent suggestions and insights to enhance your storytelling.
+                Get intelligent suggestions and insights to enhance your
+                storytelling.
               </p>
             </div>
 
@@ -152,5 +153,5 @@ export function Layout() {
         </div>
       </aside>
     </div>
-  )
+  );
 }

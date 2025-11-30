@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useStoryStore } from '@/state/store';
 import { downloadJson, copyToClipboard } from '@/utils/exportUtils';
 import type { PlotNode } from '@/types/story';
+import { Copy, Download, RefreshCw } from 'lucide-react';
 
 interface ExportViewProps {
   projectId: string;
@@ -22,7 +23,6 @@ export const ExportView: React.FC<ExportViewProps> = ({ projectId }) => {
   const variables = store.variables.filter((v) => v.projectId === projectId);
   const continuityIssues = store.continuityIssues.filter((i) => i.projectId === projectId);
 
-  // Memoize the summary generation to avoid effect dependencies issues
   const generatedSummary = useMemo(() => {
     if (!project) return '';
 
@@ -94,7 +94,7 @@ export const ExportView: React.FC<ExportViewProps> = ({ projectId }) => {
       setCopyFeedback('Copied!');
       setTimeout(() => setCopyFeedback(''), 2000);
     } catch {
-      setCopyFeedback('Failed to copy');
+      setCopyFeedback('Failed');
     }
   };
 
@@ -117,49 +117,50 @@ export const ExportView: React.FC<ExportViewProps> = ({ projectId }) => {
     downloadJson(filename, exportData);
   };
 
-  if (!project) return <div className="p-6 text-gray-400">Project not found.</div>;
+  if (!project) return <div className="p-6 text-sf-text-muted">Project not found.</div>;
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-gray-200">
-      <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800">
-        <h2 className="text-xl font-bold text-white">Project Export</h2>
-        <div className="flex space-x-3">
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="flex justify-between items-center mb-6 pb-4 border-b border-sf-border">
+        <h2 className="text-lg font-bold text-sf-text">Export</h2>
+        <div className="flex gap-2">
           <button
             onClick={() => setSummaryText(generatedSummary)}
-            className="px-3 py-1.5 text-sm bg-gray-700 hover:bg-gray-600 text-white rounded transition-colors"
+            className="btn-ghost text-sm flex items-center gap-2"
+            title="Regenerate"
           >
-            Regenerate Summary
+            <RefreshCw size={14} />
           </button>
-          <button
-            onClick={handleCopy}
-            className="px-3 py-1.5 text-sm bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors min-w-[80px]"
-          >
-            {copyFeedback || 'Copy to Clipboard'}
+          <button onClick={handleCopy} className="btn-secondary text-sm flex items-center gap-2">
+            <Copy size={14} />
+            {copyFeedback || 'Copy'}
           </button>
           <button
             onClick={handleDownloadJson}
-            className="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 text-white rounded transition-colors"
+            className="btn-primary text-sm flex items-center gap-2"
           >
-            Download JSON
+            <Download size={14} />
+            JSON
           </button>
         </div>
       </div>
 
-      <div className="flex-1 p-6 overflow-hidden flex flex-col">
-        <label htmlFor="summary-text" className="block text-sm font-medium text-gray-400 mb-2">
+      <div className="flex-1 flex flex-col min-h-0">
+        <label
+          htmlFor="summary-text"
+          className="block text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2"
+        >
           Project Summary
         </label>
         <textarea
           id="summary-text"
-          title="Project Summary"
-          className="flex-1 w-full bg-gray-950 border border-gray-700 rounded-md p-4 text-gray-300 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+          className="flex-1 w-full bg-sf-surface border border-sf-border rounded-sm p-4 text-sf-text font-mono text-sm focus:border-sf-text outline-none resize-none"
           value={summaryText}
           onChange={(e) => setSummaryText(e.target.value)}
           spellCheck={false}
         />
-        <p className="mt-2 text-xs text-gray-500">
-          This summary is generated from your project data. You can edit it before copying, but
-          changes here won't be saved to the project.
+        <p className="mt-2 text-xs text-sf-text-muted">
+          You can edit this summary before copying. Changes here are not saved to the project.
         </p>
       </div>
     </div>

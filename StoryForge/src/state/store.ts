@@ -8,7 +8,13 @@ import type {
   StoryVariable,
   AiMessage,
   ContinuityIssue,
+  Series,
+  ManuscriptContent,
+  ManuscriptComment,
+  ManuscriptSnapshot,
+  WritingTargets,
 } from '@/types';
+import { generateId } from '@/utils/ids';
 import { loadStateFromStorage, debouncedSave, type PersistedState } from './persistence';
 
 interface RootState extends PersistedState {
@@ -54,6 +60,10 @@ interface RootState extends PersistedState {
   addAiMessage: (message: AiMessage) => void;
   clearAiMessages: (projectId: string) => void;
 
+  // Writing Targets
+  setWritingTargets: (targets: WritingTargets) => void;
+  updateDailyProgress: (wordCount: number) => void;
+
   // Continuity
   addContinuityIssue: (issue: ContinuityIssue) => void;
   updateContinuityIssue: (id: string, updates: Partial<ContinuityIssue>) => void;
@@ -62,6 +72,27 @@ interface RootState extends PersistedState {
   // Suggestions
   setSuggestedVariables: (variables: StoryVariable[]) => void;
   removeSuggestedVariable: (id: string) => void;
+
+  // Series
+  addSeries: (series: Series) => void;
+  updateSeries: (id: string, updates: Partial<Series>) => void;
+  deleteSeries: (id: string) => void;
+  linkProjectToSeries: (seriesId: string, projectId: string) => void;
+  unlinkProjectFromSeries: (seriesId: string, projectId: string) => void;
+  addSharedCharacterToSeries: (seriesId: string, characterId: string) => void;
+  removeSharedCharacterFromSeries: (seriesId: string, characterId: string) => void;
+  addSharedLocationToSeries: (seriesId: string, locationId: string) => void;
+  removeSharedLocationFromSeries: (seriesId: string, locationId: string) => void;
+
+  // Manuscript
+  updateSceneManuscript: (sceneId: string, content: ManuscriptContent, wordCount: number) => void;
+  createManuscriptSnapshot: (sceneId: string, label: string) => void;
+  restoreManuscriptSnapshot: (snapshotId: string) => void;
+  deleteManuscriptSnapshot: (snapshotId: string) => void;
+  addManuscriptComment: (comment: ManuscriptComment) => void;
+  updateManuscriptComment: (id: string, updates: Partial<ManuscriptComment>) => void;
+  deleteManuscriptComment: (id: string) => void;
+  resolveManuscriptComment: (id: string) => void;
 }
 
 // Initial empty state
@@ -75,6 +106,15 @@ const initialState: PersistedState = {
   aiMessages: [],
   continuityIssues: [],
   suggestedVariables: [],
+  series: [],
+  manuscriptComments: [],
+  manuscriptSnapshots: [],
+  writingTargets: {
+    daily: 0,
+    total: 0,
+    sessionStartWordCount: 0,
+    lastSessionDate: new Date().toISOString().split('T')[0],
+  },
   ui: {},
 };
 
@@ -87,15 +127,15 @@ export const useStoryStore = create<RootState>((set) => {
     ...startState,
 
     // --- Projects ---
-    addProject: (project) => {
-      set((state) => {
+    addProject: (project: StoryProject) => {
+      set((state: RootState) => {
         const newState = { ...state, projects: [...state.projects, project] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateProject: (id, updates) => {
-      set((state) => {
+    updateProject: (id: string, updates: Partial<StoryProject>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           projects: state.projects.map((p) => (p.id === id ? { ...p, ...updates } : p)),
@@ -104,8 +144,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteProject: (id) => {
-      set((state) => {
+    deleteProject: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           projects: state.projects.filter((p) => p.id !== id),
@@ -114,8 +154,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    duplicateProject: (id) => {
-      set((state) => {
+    duplicateProject: (id: string) => {
+      set((state: RootState) => {
         const project = state.projects.find((p) => p.id === id);
         if (!project) return state;
 
@@ -137,8 +177,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    archiveProject: (id, archived) => {
-      set((state) => {
+    archiveProject: (id: string, archived: boolean) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           projects: state.projects.map((p) =>
@@ -151,15 +191,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Characters ---
-    addCharacter: (character) => {
-      set((state) => {
+    addCharacter: (character: Character) => {
+      set((state: RootState) => {
         const newState = { ...state, characters: [...state.characters, character] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateCharacter: (id, updates) => {
-      set((state) => {
+    updateCharacter: (id: string, updates: Partial<Character>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           characters: state.characters.map((c) => (c.id === id ? { ...c, ...updates } : c)),
@@ -168,8 +208,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteCharacter: (id) => {
-      set((state) => {
+    deleteCharacter: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           characters: state.characters.filter((c) => c.id !== id),
@@ -180,15 +220,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Locations ---
-    addLocation: (location) => {
-      set((state) => {
+    addLocation: (location: Location) => {
+      set((state: RootState) => {
         const newState = { ...state, locations: [...state.locations, location] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateLocation: (id, updates) => {
-      set((state) => {
+    updateLocation: (id: string, updates: Partial<Location>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           locations: state.locations.map((l) => (l.id === id ? { ...l, ...updates } : l)),
@@ -197,8 +237,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteLocation: (id) => {
-      set((state) => {
+    deleteLocation: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           locations: state.locations.filter((l) => l.id !== id),
@@ -209,15 +249,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Items ---
-    addItem: (item) => {
-      set((state) => {
+    addItem: (item: StoryItem) => {
+      set((state: RootState) => {
         const newState = { ...state, items: [...state.items, item] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateItem: (id, updates) => {
-      set((state) => {
+    updateItem: (id: string, updates: Partial<StoryItem>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           items: state.items.map((i) => (i.id === id ? { ...i, ...updates } : i)),
@@ -226,8 +266,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteItem: (id) => {
-      set((state) => {
+    deleteItem: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           items: state.items.filter((i) => i.id !== id),
@@ -237,16 +277,16 @@ export const useStoryStore = create<RootState>((set) => {
       });
     },
 
-    // --- PlotNodes ---
-    addPlotNode: (node) => {
-      set((state) => {
+    // --- Plot Nodes ---
+    addPlotNode: (node: PlotNode) => {
+      set((state: RootState) => {
         const newState = { ...state, plotNodes: [...state.plotNodes, node] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updatePlotNode: (id, updates) => {
-      set((state) => {
+    updatePlotNode: (id: string, updates: Partial<PlotNode>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           plotNodes: state.plotNodes.map((n) => (n.id === id ? { ...n, ...updates } : n)),
@@ -255,8 +295,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deletePlotNode: (id) => {
-      set((state) => {
+    deletePlotNode: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           plotNodes: state.plotNodes.filter((n) => n.id !== id),
@@ -267,15 +307,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Variables ---
-    addVariable: (variable) => {
-      set((state) => {
+    addVariable: (variable: StoryVariable) => {
+      set((state: RootState) => {
         const newState = { ...state, variables: [...state.variables, variable] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateVariable: (id, updates) => {
-      set((state) => {
+    updateVariable: (id: string, updates: Partial<StoryVariable>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           variables: state.variables.map((v) => (v.id === id ? { ...v, ...updates } : v)),
@@ -284,8 +324,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteVariable: (id) => {
-      set((state) => {
+    deleteVariable: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           variables: state.variables.filter((v) => v.id !== id),
@@ -296,22 +336,22 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- UI ---
-    setSelectedProjectId: (id) => {
-      set((state) => {
+    setSelectedProjectId: (id: string | undefined) => {
+      set((state: RootState) => {
         const newState = { ...state, ui: { ...state.ui, selectedProjectId: id } };
         debouncedSave(newState);
         return newState;
       });
     },
-    setSelectedEntityId: (id) => {
-      set((state) => {
+    setSelectedEntityId: (id: string | undefined) => {
+      set((state: RootState) => {
         const newState = { ...state, ui: { ...state.ui, selectedEntityId: id } };
         debouncedSave(newState);
         return newState;
       });
     },
-    setSelectedPlotNodeId: (id) => {
-      set((state) => {
+    setSelectedPlotNodeId: (id: string | undefined) => {
+      set((state: RootState) => {
         const newState = { ...state, ui: { ...state.ui, selectedPlotNodeId: id } };
         debouncedSave(newState);
         return newState;
@@ -319,15 +359,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- AI ---
-    addAiMessage: (message) => {
-      set((state) => {
+    addAiMessage: (message: AiMessage) => {
+      set((state: RootState) => {
         const newState = { ...state, aiMessages: [...state.aiMessages, message] };
         debouncedSave(newState);
         return newState;
       });
     },
-    clearAiMessages: (projectId) => {
-      set((state) => {
+    clearAiMessages: (projectId: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           aiMessages: state.aiMessages.filter((m) => m.projectId !== projectId),
@@ -338,15 +378,15 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Continuity ---
-    addContinuityIssue: (issue) => {
-      set((state) => {
+    addContinuityIssue: (issue: ContinuityIssue) => {
+      set((state: RootState) => {
         const newState = { ...state, continuityIssues: [...state.continuityIssues, issue] };
         debouncedSave(newState);
         return newState;
       });
     },
-    updateContinuityIssue: (id, updates) => {
-      set((state) => {
+    updateContinuityIssue: (id: string, updates: Partial<ContinuityIssue>) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           continuityIssues: state.continuityIssues.map((i) =>
@@ -357,8 +397,8 @@ export const useStoryStore = create<RootState>((set) => {
         return newState;
       });
     },
-    deleteContinuityIssue: (id) => {
-      set((state) => {
+    deleteContinuityIssue: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           continuityIssues: state.continuityIssues.filter((i) => i.id !== id),
@@ -369,19 +409,314 @@ export const useStoryStore = create<RootState>((set) => {
     },
 
     // --- Suggestions ---
-    setSuggestedVariables: (variables) => {
-      set((state) => {
+    setSuggestedVariables: (variables: StoryVariable[]) => {
+      set((state: RootState) => {
         const newState = { ...state, suggestedVariables: variables };
-        // We don't necessarily need to persist suggestions, but we can
         debouncedSave(newState);
         return newState;
       });
     },
-    removeSuggestedVariable: (id) => {
-      set((state) => {
+    removeSuggestedVariable: (id: string) => {
+      set((state: RootState) => {
         const newState = {
           ...state,
           suggestedVariables: state.suggestedVariables.filter((v) => v.id !== id),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+
+    // --- Series ---
+    addSeries: (series: Series) => {
+      set((state: RootState) => {
+        const newState = { ...state, series: [...state.series, series] };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    updateSeries: (id: string, updates: Partial<Series>) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === id ? { ...s, ...updates, updatedAt: new Date().toISOString() } : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    deleteSeries: (id: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.filter((s) => s.id !== id),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    linkProjectToSeries: (seriesId: string, projectId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  projectIds: [...(s.projectIds || []), projectId],
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    unlinkProjectFromSeries: (seriesId: string, projectId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  projectIds: s.projectIds.filter((pid) => pid !== projectId),
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    addSharedCharacterToSeries: (seriesId: string, characterId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  sharedCharacterIds: [...(s.sharedCharacterIds || []), characterId],
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    removeSharedCharacterFromSeries: (seriesId: string, characterId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  sharedCharacterIds: (s.sharedCharacterIds || []).filter(
+                    (cid) => cid !== characterId
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    addSharedLocationToSeries: (seriesId: string, locationId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  sharedLocationIds: [...(s.sharedLocationIds || []), locationId],
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    removeSharedLocationFromSeries: (seriesId: string, locationId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          series: state.series.map((s) =>
+            s.id === seriesId
+              ? {
+                  ...s,
+                  sharedLocationIds: (s.sharedLocationIds || []).filter(
+                    (lid) => lid !== locationId
+                  ),
+                  updatedAt: new Date().toISOString(),
+                }
+              : s
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+
+    // --- Manuscript ---
+    updateSceneManuscript: (sceneId: string, content: ManuscriptContent, wordCount: number) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          plotNodes: state.plotNodes.map((node) =>
+            node.id === sceneId
+              ? {
+                  ...node,
+                  manuscriptContent: content,
+                  wordCount,
+                  updatedAt: new Date().toISOString(),
+                }
+              : node
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    createManuscriptSnapshot: (sceneId: string, label: string) => {
+      set((state: RootState) => {
+        const scene = state.plotNodes.find((n) => n.id === sceneId);
+        if (!scene || !scene.manuscriptContent) return state;
+
+        const snapshot: ManuscriptSnapshot = {
+          id: generateId(),
+          sceneId,
+          projectId: scene.projectId,
+          label,
+          content: scene.manuscriptContent,
+          wordCount: scene.wordCount || 0,
+          createdAt: new Date().toISOString(),
+        };
+
+        const newState = {
+          ...state,
+          manuscriptSnapshots: [...state.manuscriptSnapshots, snapshot],
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    restoreManuscriptSnapshot: (snapshotId: string) => {
+      set((state: RootState) => {
+        const snapshot = state.manuscriptSnapshots.find((s) => s.id === snapshotId);
+        if (!snapshot) return state;
+
+        const newState = {
+          ...state,
+          plotNodes: state.plotNodes.map((node) =>
+            node.id === snapshot.sceneId
+              ? {
+                  ...node,
+                  manuscriptContent: snapshot.content,
+                  wordCount: snapshot.wordCount,
+                  updatedAt: new Date().toISOString(),
+                }
+              : node
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    deleteManuscriptSnapshot: (snapshotId: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          manuscriptSnapshots: state.manuscriptSnapshots.filter((s) => s.id !== snapshotId),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    addManuscriptComment: (comment: ManuscriptComment) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          manuscriptComments: [...state.manuscriptComments, comment],
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    updateManuscriptComment: (id: string, updates: Partial<ManuscriptComment>) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          manuscriptComments: state.manuscriptComments.map((comment) =>
+            comment.id === id
+              ? { ...comment, ...updates, updatedAt: new Date().toISOString() }
+              : comment
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    deleteManuscriptComment: (id: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          manuscriptComments: state.manuscriptComments.filter((c) => c.id !== id),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    resolveManuscriptComment: (id: string) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          manuscriptComments: state.manuscriptComments.map((comment) =>
+            comment.id === id
+              ? { ...comment, resolved: true, updatedAt: new Date().toISOString() }
+              : comment
+          ),
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    setWritingTargets: (targets: WritingTargets) => {
+      set((state: RootState) => {
+        const newState = {
+          ...state,
+          writingTargets: targets,
+        };
+        debouncedSave(newState);
+        return newState;
+      });
+    },
+    updateDailyProgress: (wordCount: number) => {
+      set((state: RootState) => {
+        const today = new Date().toISOString().split('T')[0];
+        const isNewDay = state.writingTargets.lastSessionDate !== today;
+
+        const newState = {
+          ...state,
+          writingTargets: {
+            ...state.writingTargets,
+            sessionStartWordCount: isNewDay
+              ? 0
+              : state.writingTargets.sessionStartWordCount + wordCount,
+            lastSessionDate: today,
+          },
         };
         debouncedSave(newState);
         return newState;

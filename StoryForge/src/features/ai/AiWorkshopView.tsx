@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useStoryStore } from '@/state/store';
+import { generateId } from '@/utils/ids';
 import { useShallow } from 'zustand/react/shallow';
 import {
   getApiKey,
@@ -11,6 +12,7 @@ import { buildStoryContextSnapshot } from '../../utils/buildStoryContextSnapshot
 import { SplitView } from '../../components/ui/SplitView';
 import { ContinuityIssuesPanel } from '../continuity/ContinuityIssuesPanel';
 import type { AiMessage } from '../../types';
+import { Settings, Sparkles, FileText, User } from 'lucide-react';
 
 interface AiWorkshopViewProps {
   projectId: string;
@@ -95,7 +97,7 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
       const response = await generateAiResponse(payload);
 
       const assistantMsg: AiMessage = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         projectId,
         role: 'assistant',
         content: response.message,
@@ -111,7 +113,7 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
     } catch (error) {
       console.error('Failed to get AI response:', error);
       const errorMsg: AiMessage = {
-        id: crypto.randomUUID(),
+        id: generateId(),
         projectId,
         role: 'system',
         content:
@@ -125,13 +127,14 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
   };
 
   const ChatArea = (
-    <div className="flex flex-col h-full bg-gray-900">
+    <div className="flex flex-col h-full">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
         {messages.length === 0 && (
-          <div className="text-center text-gray-500 mt-10">
-            <p>Start a conversation with your AI writing assistant.</p>
-            <p className="text-sm mt-2">
+          <div className="text-center text-sf-text-muted mt-20">
+            <Sparkles size={48} className="mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">AI Writing Assistant</p>
+            <p className="text-sm mt-2 max-w-md mx-auto">
               Select a mode and ask for help with brainstorming, continuity, or drafting.
             </p>
           </div>
@@ -143,40 +146,41 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
-              className={`max-w-[80%] rounded-lg p-3 ${msg.role === 'user'
-                  ? 'bg-indigo-600 text-white'
+              className={`max-w-[80%] rounded-sm p-4 text-sm leading-relaxed ${
+                msg.role === 'user'
+                  ? 'bg-sf-text text-sf-bg'
                   : msg.role === 'system'
-                    ? 'bg-red-900/50 text-red-200 border border-red-800'
-                    : 'bg-gray-800 text-gray-200'
-                }`}
+                    ? 'bg-sf-danger/10 text-sf-danger border border-sf-danger/20'
+                    : 'bg-sf-surface border border-sf-border text-sf-text'
+              }`}
             >
-              <div className="whitespace-pre-wrap text-sm">{msg.content}</div>
-              <div className="text-[10px] opacity-50 mt-1 text-right">
-                {new Date(msg.createdAt).toLocaleTimeString()}
-              </div>
+              <div className="whitespace-pre-wrap">{msg.content}</div>
             </div>
           </div>
         ))}
 
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-800 rounded-lg p-3 text-gray-400 text-sm">Thinking...</div>
+            <div className="bg-sf-surface border border-sf-border rounded-sm p-3 text-sf-text-muted text-sm flex items-center gap-2">
+              <Sparkles size={14} className="animate-pulse" /> Thinking...
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
-      <div className="p-4 bg-gray-800 border-t border-gray-700">
-        <div className="flex gap-2 mb-2">
+      <div className="p-4 border-t border-sf-border">
+        <div className="flex gap-2 mb-3 overflow-x-auto pb-1">
           {(['generic', 'brainstorm', 'continuity', 'character', 'scene'] as const).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
-              className={`px-3 py-1 rounded-full text-xs font-medium capitalize transition-colors ${mode === m
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
+              className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider transition-colors whitespace-nowrap ${
+                mode === m
+                  ? 'bg-sf-text text-sf-bg'
+                  : 'bg-sf-surface text-sf-text-muted hover:text-sf-text border border-sf-border'
+              }`}
             >
               {m}
             </button>
@@ -193,12 +197,12 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
               }
             }}
             placeholder="Type your message..."
-            className="flex-1 bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500 resize-none h-20"
+            className="flex-1 bg-transparent border border-sf-border rounded-sm px-3 py-2 text-sf-text focus:border-sf-text outline-none resize-none h-20"
           />
           <button
             onClick={handleSendMessage}
             disabled={isLoading || !inputMessage.trim()}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed self-end h-10"
+            className="px-4 py-2 bg-sf-text text-sf-bg rounded-sm hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed self-end h-10 font-bold uppercase tracking-wider text-xs"
           >
             Send
           </button>
@@ -208,23 +212,25 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
   );
 
   const ContextPanel = (
-    <div className="h-full bg-gray-900 border-l border-gray-700 flex flex-col">
-      <div className="flex border-b border-gray-700">
+    <div className="h-full border-l border-sf-border flex flex-col">
+      <div className="flex border-b border-sf-border">
         <button
           onClick={() => setSidebarTab('context')}
-          className={`flex-1 py-3 text-xs font-medium uppercase tracking-wider ${sidebarTab === 'context'
-              ? 'text-white border-b-2 border-indigo-500 bg-gray-800'
-              : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
-            }`}
+          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+            sidebarTab === 'context'
+              ? 'bg-sf-surface text-sf-text border-b-2 border-sf-text'
+              : 'text-sf-text-muted hover:text-sf-text'
+          }`}
         >
           Context
         </button>
         <button
           onClick={() => setSidebarTab('continuity')}
-          className={`flex-1 py-3 text-xs font-medium uppercase tracking-wider ${sidebarTab === 'continuity'
-              ? 'text-white border-b-2 border-indigo-500 bg-gray-800'
-              : 'text-gray-400 hover:text-gray-300 hover:bg-gray-800/50'
-            }`}
+          className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider transition-colors ${
+            sidebarTab === 'continuity'
+              ? 'bg-sf-surface text-sf-text border-b-2 border-sf-text'
+              : 'text-sf-text-muted hover:text-sf-text'
+          }`}
         >
           Continuity
         </button>
@@ -232,41 +238,48 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
 
       <div className="flex-1 overflow-y-auto p-4">
         {sidebarTab === 'context' ? (
-          <div className="space-y-6">
+          <div className="space-y-8">
             <div>
-              <h4 className="text-xs font-medium text-indigo-400 mb-1">Current Mode</h4>
-              <p className="text-sm text-white capitalize">{mode}</p>
+              <h4 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2 flex items-center gap-2">
+                <Settings size={12} /> Current Mode
+              </h4>
+              <p className="text-sm text-sf-text capitalize font-medium">{mode}</p>
             </div>
 
             <div>
-              <h4 className="text-xs font-medium text-indigo-400 mb-1">Active Scene</h4>
+              <h4 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2 flex items-center gap-2">
+                <FileText size={12} /> Active Scene
+              </h4>
               {currentPlotNodeId ? (
-                <p className="text-sm text-white">
+                <p className="text-sm text-sf-text">
                   {plotNodes.find((n) => n.id === currentPlotNodeId)?.title || 'Unknown Scene'}
                 </p>
               ) : (
-                <p className="text-sm text-gray-500 italic">No scene selected</p>
+                <p className="text-sm text-sf-text-muted italic">No scene selected</p>
               )}
             </div>
 
             <div>
-              <h4 className="text-xs font-medium text-indigo-400 mb-1">Key Characters</h4>
-              <ul className="text-sm text-gray-300 space-y-1">
+              <h4 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-2 flex items-center gap-2">
+                <User size={12} /> Key Characters
+              </h4>
+              <ul className="text-sm text-sf-text space-y-1">
                 {characters
                   .filter((c) => c.projectId === projectId)
                   .slice(0, 5)
                   .map((c) => (
-                    <li key={c.id}>
-                      • {c.name} ({c.role})
+                    <li key={c.id} className="flex items-center gap-2">
+                      <span className="w-1 h-1 rounded-full bg-sf-text-muted"></span>
+                      {c.name} <span className="text-sf-text-muted text-xs">({c.role})</span>
                     </li>
                   ))}
               </ul>
             </div>
 
-            <div className="pt-4 border-t border-gray-700">
+            <div className="pt-4 border-t border-sf-border">
               <button
                 onClick={() => setShowApiKeyModal(true)}
-                className="text-xs text-gray-500 hover:text-gray-300 underline"
+                className="text-xs text-sf-accent hover:underline"
               >
                 Update API Key
               </button>
@@ -285,10 +298,10 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
 
       {/* API Key Modal */}
       {showApiKeyModal && (
-        <div className="absolute inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full border border-gray-700">
-            <h2 className="text-xl font-bold text-white mb-4">Enter Gemini API Key</h2>
-            <p className="text-gray-300 text-sm mb-4">
+        <div className="absolute inset-0 bg-sf-bg/80 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-sf-surface p-6 rounded-sm shadow-xl max-w-md w-full border border-sf-border">
+            <h2 className="text-xl font-bold text-sf-text mb-4">Enter Gemini API Key</h2>
+            <p className="text-sf-text-muted text-sm mb-4">
               To use the AI Workshop, you need a Google Gemini API key. Your key is stored locally
               in your browser and never sent to our servers.
             </p>
@@ -297,13 +310,13 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
               value={inputApiKey}
               onChange={(e) => setInputApiKey(e.target.value)}
               placeholder="Paste your API key here"
-              className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-indigo-500 mb-4"
+              className="w-full bg-transparent border border-sf-border rounded-sm px-3 py-2 text-sf-text focus:border-sf-text outline-none mb-4"
             />
             <div className="flex justify-end gap-3">
               {apiKey && (
                 <button
                   onClick={() => setShowApiKeyModal(false)}
-                  className="px-4 py-2 text-gray-300 hover:text-white"
+                  className="px-4 py-2 text-sf-text-muted hover:text-sf-text text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -311,18 +324,18 @@ export const AiWorkshopView: React.FC<AiWorkshopViewProps> = ({ projectId }) => 
               <button
                 onClick={handleSaveApiKey}
                 disabled={!inputApiKey.trim()}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50"
+                className="btn-primary"
               >
                 Save Key
               </button>
             </div>
-            <p className="text-xs text-gray-500 mt-4 text-center">
+            <p className="text-xs text-sf-text-muted mt-4 text-center">
               Get a key at{' '}
               <a
                 href="https://aistudio.google.com/app/apikey"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-400 hover:underline"
+                className="text-sf-accent hover:underline"
               >
                 Google AI Studio
               </a>

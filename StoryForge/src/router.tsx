@@ -1,106 +1,129 @@
-import { createBrowserRouter, Navigate, useParams } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { ProjectWorkspacePage } from '@/pages/ProjectWorkspacePage';
 import { SettingsView } from '@/features/settings/SettingsView';
 import { NotFoundPage } from '@/pages/NotFoundPage';
-import { StoryBibleView } from '@/features/storyBible/StoryBibleView';
-import { PlotOutlineView } from '@/features/storyBible/components/PlotOutlineView';
-import { TimelineView } from '@/features/timeline/TimelineView';
-import { AiWorkshopView } from '@/features/ai/AiWorkshopView';
+import { LandingPage } from '@/pages/LandingPage';
+import { LoginForm } from '@/features/auth/components/LoginForm';
+import { SignupForm } from '@/features/auth/components/SignupForm';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import {
+  StoryBibleWrapper,
+  PlotWrapper,
+  TimelineWrapper,
+  AiWorkshopWrapper,
+} from '@/components/RouterWrappers';
+import { ProjectOverview } from '@/features/project/ProjectOverview';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { SeriesListPage } from '@/pages/SeriesListPage';
+import { SeriesDetailView } from '@/features/series/SeriesDetailView';
+import { ManuscriptPage } from '@/features/manuscript';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: <LandingPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginForm />,
+  },
+  {
+    path: '/signup',
+    element: <SignupForm />,
+  },
+  {
+    element: <ProtectedRoute />,
+    errorElement: <ErrorBoundary />,
     children: [
       {
-        index: true,
-        element: <DashboardPage />,
-      },
-      {
-        path: 'project/:projectId',
-        element: <ProjectWorkspacePage />,
+        path: '/app',
+        element: <AppLayout />,
         children: [
           {
             index: true,
-            element: <Navigate to="overview" replace />,
+            element: <Navigate to="dashboard" replace />,
           },
           {
-            path: 'overview',
-            element: (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Project Stats</h2>
-                  <p className="text-gray-400">Word count, scene count, etc. coming soon.</p>
-                </div>
-                <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-                  <h2 className="text-xl font-semibold text-white mb-4">Recent Activity</h2>
-                  <p className="text-gray-400">No recent activity.</p>
-                </div>
-              </div>
-            ),
+            path: 'dashboard',
+            element: <DashboardPage />,
           },
           {
-            path: 'story-bible',
-            element: <StoryBibleWrapper />,
+            path: 'project/:projectId',
+            element: <ProjectWorkspacePage />,
+            children: [
+              {
+                index: true,
+                element: <Navigate to="overview" replace />,
+              },
+              {
+                path: 'overview',
+                element: <ProjectOverview />,
+              },
+              {
+                path: 'story-bible',
+                element: <StoryBibleWrapper />,
+              },
+              {
+                path: 'plot',
+                element: <PlotWrapper />,
+              },
+              {
+                path: 'timeline',
+                element: <TimelineWrapper />,
+              },
+              {
+                path: 'ai-workshop',
+                element: <AiWorkshopWrapper />,
+              },
+              {
+                path: 'manuscript',
+                children: [
+                  {
+                    index: true,
+                    element: <ManuscriptPage />,
+                  },
+                  {
+                    path: ':sceneId',
+                    element: <ManuscriptPage />,
+                  },
+                ],
+              },
+              {
+                path: 'exports',
+                element: (
+                  <div className="p-6 border border-sf-border rounded-sm bg-sf-surface">
+                    <h2 className="text-lg font-bold text-sf-text mb-4">Exports</h2>
+                    <p className="text-sf-text-muted">Export to PDF, Word, etc... (Coming Soon)</p>
+                  </div>
+                ),
+              },
+            ],
           },
           {
-            path: 'plot',
-            element: <PlotWrapper />,
+            path: 'series',
+            children: [
+              {
+                index: true,
+                element: <SeriesListPage />,
+              },
+              {
+                path: ':seriesId',
+                element: <SeriesDetailView />,
+              },
+            ],
           },
           {
-            path: 'timeline',
-            element: <TimelineWrapper />,
-          },
-          {
-            path: 'ai-workshop',
-            element: <AiWorkshopWrapper />,
-          },
-          {
-            path: 'exports',
-            element: (
-              <div className="bg-gray-800 border border-gray-700 rounded-lg p-6">
-                <h2 className="text-xl font-semibold text-white mb-4">Exports</h2>
-                <p className="text-gray-400">Export to PDF, Word, etc... (Coming Soon)</p>
-              </div>
-            ),
+            path: 'settings',
+            element: <SettingsView />,
           },
         ],
       },
-      {
-        path: 'settings',
-        element: <SettingsView />,
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />,
-      },
     ],
   },
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
 ]);
-
-// Wrapper components to extract params and pass to features
-function StoryBibleWrapper() {
-  const { projectId } = useParams<{ projectId: string }>();
-  if (!projectId) return null;
-  return <StoryBibleView projectId={projectId} />;
-}
-
-function PlotWrapper() {
-  const { projectId } = useParams<{ projectId: string }>();
-  if (!projectId) return null;
-  return <PlotOutlineView projectId={projectId} />;
-}
-
-function TimelineWrapper() {
-  const { projectId } = useParams<{ projectId: string }>();
-  if (!projectId) return null;
-  return <TimelineView projectId={projectId} />;
-}
-
-function AiWorkshopWrapper() {
-  const { projectId } = useParams<{ projectId: string }>();
-  if (!projectId) return null;
-  return <AiWorkshopView projectId={projectId} />;
-}

@@ -22,17 +22,17 @@
  * @property updatedAt - ISO 8601 timestamp of last modification
  */
 export interface StoryProject {
-  id: string
-  title: string
-  subtitle?: string
-  status: 'planning' | 'drafting' | 'revising' | 'on_hold'
-  genre?: string
-  subgenres?: string[]
-  themes?: string[]
-  tone?: string
-  logline?: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  subtitle?: string;
+  status: "planning" | "drafting" | "revising" | "on_hold";
+  genre?: string;
+  subgenres?: string[];
+  themes?: string[];
+  tone?: string;
+  logline?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -53,18 +53,18 @@ export interface StoryProject {
  * @property notes - Writer's notes and additional context
  */
 export interface Character {
-  id: string
-  projectId: string
-  name: string
-  role: 'protagonist' | 'antagonist' | 'supporting' | 'other'
-  age?: string
-  traits?: string[]
-  goals?: string
-  flaws?: string
-  backstory?: string
-  relationships: CharacterRelationship[]
-  tags?: string[]
-  notes?: string
+  id: string;
+  projectId: string;
+  name: string;
+  role: "protagonist" | "antagonist" | "supporting" | "other";
+  age?: string;
+  traits?: string[];
+  goals?: string;
+  flaws?: string;
+  backstory?: string;
+  relationships: CharacterRelationship[];
+  tags?: string[];
+  notes?: string;
 }
 
 /**
@@ -76,9 +76,9 @@ export interface Character {
  * @property description - Contextual details about the relationship
  */
 export interface CharacterRelationship {
-  characterId: string
-  type: 'ally' | 'enemy' | 'family' | 'mentor' | 'romantic' | 'other'
-  description?: string
+  characterId: string;
+  type: "ally" | "enemy" | "family" | "mentor" | "romantic" | "other";
+  description?: string;
 }
 
 /**
@@ -94,13 +94,13 @@ export interface CharacterRelationship {
  * @property tags - Custom metadata tags for organization
  */
 export interface Location {
-  id: string
-  projectId: string
-  name: string
-  type?: string
-  description?: string
-  importantEvents?: string[]
-  tags?: string[]
+  id: string;
+  projectId: string;
+  name: string;
+  type?: string;
+  description?: string;
+  importantEvents?: string[];
+  tags?: string[];
 }
 
 /**
@@ -116,13 +116,13 @@ export interface Location {
  * @property tags - Custom metadata tags for organization
  */
 export interface StoryItem {
-  id: string
-  projectId: string
-  name: string
-  type?: string
-  description?: string
-  importance?: 'minor' | 'major' | 'mcguffin'
-  tags?: string[]
+  id: string;
+  projectId: string;
+  name: string;
+  type?: string;
+  description?: string;
+  importance?: "minor" | "major" | "mcguffin";
+  tags?: string[];
 }
 
 /**
@@ -147,21 +147,21 @@ export interface StoryItem {
  * @property notes - Writer's notes and reminders
  */
 export interface PlotNode {
-  id: string
-  projectId: string
-  parentId: string | null
-  type: 'act' | 'arc' | 'chapter' | 'scene'
-  title: string
-  summary?: string
-  order: number
-  povCharacterId?: string
-  locationId?: string
-  timelinePosition?: string
-  keywords?: string[]
-  goals?: string
-  conflict?: string
-  outcome?: string
-  notes?: string
+  id: string;
+  projectId: string;
+  parentId: string | null;
+  type: "act" | "arc" | "chapter" | "scene";
+  title: string;
+  summary?: string;
+  order: number;
+  povCharacterId?: string;
+  locationId?: string;
+  timelinePosition?: string;
+  keywords?: string[];
+  goals?: string;
+  conflict?: string;
+  outcome?: string;
+  notes?: string;
 }
 
 /**
@@ -180,15 +180,15 @@ export interface PlotNode {
  * @property lastUpdated - ISO 8601 timestamp of last change
  */
 export interface StoryVariable {
-  id: string
-  projectId: string
-  key: string
-  label: string
-  type: 'string' | 'number' | 'boolean' | 'enum' | 'rule'
-  value: string
-  sourceIds?: string[]
-  description?: string
-  lastUpdated: string
+  id: string;
+  projectId: string;
+  key: string;
+  label: string;
+  type: "string" | "number" | "boolean" | "enum" | "rule";
+  value: string;
+  sourceIds?: string[];
+  description?: string;
+  lastUpdated: string;
 }
 
 /**
@@ -201,10 +201,10 @@ export interface StoryVariable {
  * @property namedVariables - Key story variables and their values
  */
 export interface StoryContextSnapshot {
-  projectSummary: string
-  keyCharacters: string[]
-  currentPlotNodeSummary?: string
-  namedVariables: Record<string, string>
+  projectSummary: string;
+  keyCharacters: string[];
+  currentPlotNodeSummary?: string;
+  namedVariables: Record<string, string>;
 }
 
 /**
@@ -219,12 +219,12 @@ export interface StoryContextSnapshot {
  * @property contextSnapshot - Story context at time of message
  */
 export interface AiMessage {
-  id: string
-  projectId: string
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  createdAt: string
-  contextSnapshot?: StoryContextSnapshot
+  id: string;
+  projectId: string;
+  role: "user" | "assistant" | "system";
+  content: string;
+  createdAt: string;
+  contextSnapshot?: StoryContextSnapshot;
 }
 
 /**
@@ -244,14 +244,14 @@ export interface AiMessage {
  * @property resolvedAt - ISO 8601 timestamp when marked as resolved
  */
 export interface ContinuityIssue {
-  id: string
-  projectId: string
-  type: 'character' | 'timeline' | 'world_rule' | 'logic' | 'other'
-  description: string
-  severity: 'minor' | 'moderate' | 'major'
-  relatedEntityIds?: string[]
-  suggestedFix?: string
-  createdAt: string
-  resolved: boolean
-  resolvedAt?: string
+  id: string;
+  projectId: string;
+  type: "character" | "timeline" | "world_rule" | "logic" | "other";
+  description: string;
+  severity: "minor" | "moderate" | "major";
+  relatedEntityIds?: string[];
+  suggestedFix?: string;
+  createdAt: string;
+  resolved: boolean;
+  resolvedAt?: string;
 }

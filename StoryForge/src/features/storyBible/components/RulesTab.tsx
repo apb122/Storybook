@@ -3,53 +3,43 @@ import { Book, Zap, Scale } from 'lucide-react';
 
 export const RulesTab: React.FC = () => {
   return (
-    <div className="flex flex-col h-full bg-gray-900 text-white items-center justify-center p-8">
-      <div className="max-w-2xl text-center space-y-6">
-        <div className="flex justify-center space-x-4 mb-8">
-          <div className="p-4 bg-indigo-900/30 rounded-full border border-indigo-500/30">
-            <Book size={32} className="text-indigo-400" />
-          </div>
-          <div className="p-4 bg-purple-900/30 rounded-full border border-purple-500/30">
-            <Zap size={32} className="text-purple-400" />
-          </div>
-          <div className="p-4 bg-emerald-900/30 rounded-full border border-emerald-500/30">
-            <Scale size={32} className="text-emerald-400" />
-          </div>
+    <div className="flex flex-col h-full items-center justify-center p-8 text-center">
+      <div className="max-w-xl space-y-8">
+        <div className="flex justify-center gap-6">
+          <Book size={24} className="text-sf-text-muted" />
+          <Zap size={24} className="text-sf-text-muted" />
+          <Scale size={24} className="text-sf-text-muted" />
         </div>
 
-        <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
-          World Rules & Systems
-        </h2>
+        <div>
+          <h2 className="text-2xl font-bold text-sf-text mb-4">World Rules & Systems</h2>
+          <p className="text-sf-text-muted leading-relaxed">
+            Define the laws of physics, magic systems, and societal rules that govern your story
+            world. This module helps maintain consistency across your narrative.
+          </p>
+        </div>
 
-        <p className="text-gray-400 text-lg leading-relaxed">
-          Define the laws of physics, magic systems, and societal rules that govern your story
-          world. This module will help you maintain consistency and track how these rules affect
-          your characters and plot.
-        </p>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left mt-8">
-          <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-            <div className="flex items-center gap-2 mb-2 text-indigo-400">
-              <Zap size={20} />
-              <h3 className="font-semibold">Magic Systems</h3>
-            </div>
-            <p className="text-sm text-gray-500">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+          <div className="p-4 border border-sf-border rounded-sm">
+            <h3 className="font-bold text-sf-text mb-2 flex items-center gap-2">
+              <Zap size={16} /> Magic Systems
+            </h3>
+            <p className="text-sm text-sf-text-muted">
               Define costs, limitations, and sources of power.
             </p>
           </div>
-          <div className="p-4 bg-gray-800/50 rounded-lg border border-gray-700">
-            <div className="flex items-center gap-2 mb-2 text-emerald-400">
-              <Scale size={20} />
-              <h3 className="font-semibold">Laws & Physics</h3>
-            </div>
-            <p className="text-sm text-gray-500">
+          <div className="p-4 border border-sf-border rounded-sm">
+            <h3 className="font-bold text-sf-text mb-2 flex items-center gap-2">
+              <Scale size={16} /> Laws & Physics
+            </h3>
+            <p className="text-sm text-sf-text-muted">
               Establish the fundamental rules of your universe.
             </p>
           </div>
         </div>
 
-        <div className="pt-8">
-          <span className="inline-block px-4 py-2 bg-gray-800 rounded-full text-sm text-gray-500 border border-gray-700">
+        <div className="pt-4">
+          <span className="inline-block px-3 py-1 bg-sf-surface border border-sf-border rounded-full text-xs text-sf-text-muted uppercase tracking-wider">
             Coming Soon
           </span>
         </div>

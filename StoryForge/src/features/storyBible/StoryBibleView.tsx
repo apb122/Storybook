@@ -25,14 +25,13 @@ export const StoryBibleView: React.FC<StoryBibleViewProps> = ({ projectId }) => 
   ];
 
   return (
-    <div className="flex flex-col h-full space-y-4">
-      <div className="flex items-center justify-between px-1">
-        <h1 className="text-2xl font-bold text-white">Story Bible</h1>
+    <div className="flex flex-col h-[calc(100vh-8rem)]">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-sf-text mb-6">Story Bible</h1>
+        <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      <Tabs tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-
-      <div className="flex-1 min-h-0 bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+      <div className="flex-1 min-h-0 bg-sf-surface border border-sf-border rounded-sm overflow-hidden">
         {activeTab === 'characters' && <CharacterTab projectId={projectId} />}
         {activeTab === 'locations' && <LocationTab projectId={projectId} />}
         {activeTab === 'items' && <ItemTab projectId={projectId} />}

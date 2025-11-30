@@ -3,12 +3,21 @@
  * Uses crypto.randomUUID() if available (secure contexts),
  * otherwise falls back to a Math.random() based implementation.
  */
+
+// Extend the Crypto interface to include randomUUID if it's missing from the lib definitions
+interface CryptoWithUUID {
+  randomUUID(): string;
+}
+
 export const generateId = (): string => {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    try {
-      return crypto.randomUUID();
-    } catch (e) {
-      console.warn('crypto.randomUUID() failed, falling back to manual generation', e);
+  if (typeof window !== 'undefined' && window.crypto) {
+    const crypto = window.crypto as unknown as CryptoWithUUID;
+    if (typeof crypto.randomUUID === 'function') {
+      try {
+        return crypto.randomUUID();
+      } catch (e) {
+        console.warn('crypto.randomUUID() failed, falling back to manual generation', e);
+      }
     }
   }
 

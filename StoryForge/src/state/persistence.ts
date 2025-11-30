@@ -7,6 +7,10 @@ import type {
   StoryVariable,
   AiMessage,
   ContinuityIssue,
+  Series,
+  ManuscriptComment,
+  ManuscriptSnapshot,
+  WritingTargets,
 } from '@/types';
 
 const STORAGE_KEY = 'storyforge_state';
@@ -27,6 +31,10 @@ export interface PersistedState {
   aiMessages: AiMessage[];
   continuityIssues: ContinuityIssue[];
   suggestedVariables: StoryVariable[];
+  series: Series[];
+  manuscriptComments: ManuscriptComment[];
+  manuscriptSnapshots: ManuscriptSnapshot[];
+  writingTargets: WritingTargets;
   ui: {
     selectedProjectId?: string;
     selectedEntityId?: string;

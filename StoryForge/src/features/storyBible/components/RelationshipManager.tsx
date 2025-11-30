@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Character, CharacterRelationship } from '@/types/story';
+import type { CharacterRelationship } from '@/types/story';
 import { useStoryStore } from '@/state/store';
 import { Plus, Trash2, Heart, Shield, Users } from 'lucide-react';
 

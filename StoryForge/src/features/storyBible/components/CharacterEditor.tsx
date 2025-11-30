@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import type { Character, CharacterRelationship } from '@/types/story';
-import {
-  Save,
-  User,
-  Hash,
-  AlignLeft,
-  Heart,
-  Target,
-  AlertCircle,
-  Network,
-  BookOpen,
-} from 'lucide-react';
+import { User, Hash, AlignLeft, Heart, Target, AlertCircle } from 'lucide-react';
 import { RelationshipManager } from './RelationshipManager';
 import { RelationshipGraph } from './RelationshipGraph';
 import { TraitLibrary } from './TraitLibrary';
+import { CharacterContinuityView } from './CharacterContinuityView';
 
 interface CharacterEditorProps {
   character: Character;
@@ -23,16 +14,15 @@ interface CharacterEditorProps {
 export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onSave }) => {
   const [formData, setFormData] = useState<Partial<Character>>(character);
   const [isDirty, setIsDirty] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'network'>('details');
-  const [showTraitLibrary, setShowTraitLibrary] = useState(false); // Debounced save
+  const [activeTab, setActiveTab] = useState<'details' | 'network' | 'continuity'>('details');
+  const [showTraitLibrary, setShowTraitLibrary] = useState(false);
+
   useEffect(() => {
     if (!isDirty) return;
-
     const timer = setTimeout(() => {
       onSave(character.id, formData);
       setIsDirty(false);
     }, 1000);
-
     return () => clearTimeout(timer);
   }, [formData, isDirty, character.id, onSave]);
 
@@ -76,7 +66,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-900 relative">
+    <div className="flex flex-col h-full overflow-hidden relative">
       {showTraitLibrary && (
         <TraitLibrary
           onClose={() => setShowTraitLibrary(false)}
@@ -86,223 +76,198 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
       )}
 
       {/* Header */}
-      <div className="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-800">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
-            {formData.name?.[0]?.toUpperCase() || '?'}
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">{formData.name}</h2>
-            <span className="text-sm text-gray-400 capitalize">{formData.role}</span>
+      <div className="flex justify-between items-start mb-6 pb-4 border-b border-sf-border">
+        <div>
+          <input
+            type="text"
+            name="name"
+            value={formData.name || ''}
+            onChange={handleChange}
+            className="text-3xl font-bold bg-transparent border-none p-0 focus:ring-0 text-sf-text placeholder-sf-text-muted w-full"
+            placeholder="Character Name"
+            aria-label="Character Name"
+          />
+          <div className="flex items-center gap-2 mt-2">
+            <select
+              name="role"
+              value={formData.role || 'supporting'}
+              onChange={handleChange}
+              className="text-sm bg-transparent border-none p-0 text-sf-text-muted font-mono uppercase tracking-wider focus:ring-0 cursor-pointer"
+              aria-label="Character Role"
+            >
+              <option value="protagonist">Protagonist</option>
+              <option value="antagonist">Antagonist</option>
+              <option value="supporting">Supporting</option>
+              <option value="other">Other</option>
+            </select>
+            <span className="text-sf-border">|</span>
+            <span className="text-xs text-sf-text-muted">{isDirty ? 'Saving...' : 'Saved'}</span>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex bg-gray-700 rounded-lg p-1">
-            <button
-              onClick={() => setActiveTab('details')}
-              className={`px - 3 py - 1.5 rounded - md text - sm font - medium transition - colors flex items - center gap - 2 ${
-                activeTab === 'details'
-                  ? 'bg-gray-600 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              } `}
-            >
-              <User size={14} /> Details
-            </button>
-            <button
-              onClick={() => setActiveTab('network')}
-              className={`px - 3 py - 1.5 rounded - md text - sm font - medium transition - colors flex items - center gap - 2 ${
-                activeTab === 'network'
-                  ? 'bg-gray-600 text-white shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              } `}
-            >
-              <Network size={14} /> Network
-            </button>
-          </div>
-          <div className="flex items-center gap-2">
-            {isDirty && <span className="text-xs text-yellow-500 mr-2">Unsaved changes...</span>}
-            <button
-              onClick={() => {
-                onSave(character.id, formData);
-                setIsDirty(false);
-              }}
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md font-medium transition-colors flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save
-            </button>
-          </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('details')}
+            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'details' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+          >
+            Details
+          </button>
+          <button
+            onClick={() => setActiveTab('network')}
+            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'network' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+          >
+            Network
+          </button>
+          <button
+            onClick={() => setActiveTab('continuity')}
+            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'continuity' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+          >
+            Continuity
+          </button>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto pr-2">
         {activeTab === 'network' ? (
           <RelationshipGraph characterId={character.id} />
+        ) : activeTab === 'continuity' ? (
+          <CharacterContinuityView characterId={character.id} projectId={character.projectId} />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column: Core Stats */}
-            <div className="space-y-6 lg:col-span-1">
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 space-y-4">
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                  <User size={14} /> Core Identity
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+            {/* Left Column */}
+            <div className="space-y-8">
+              <section>
+                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <User size={12} /> Core Stats
                 </h3>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Name</label>
-                  <input
-                    type="text"
-                    aria-label="Character Name"
-                    name="name"
-                    value={formData.name || ''}
-                    onChange={handleChange}
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-sf-text-muted mb-1">Age</label>
+                    <input
+                      type="text"
+                      name="age"
+                      value={formData.age || ''}
+                      onChange={handleChange}
+                      className="w-full"
+                      aria-label="Age"
+                    />
+                  </div>
                 </div>
+              </section>
 
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Role</label>
-                  <select
-                    name="role"
-                    aria-label="Character Role"
-                    value={formData.role || 'supporting'}
-                    onChange={handleChange}
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  >
-                    <option value="protagonist">Protagonist</option>
-                    <option value="antagonist">Antagonist</option>
-                    <option value="supporting">Supporting</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">Age</label>
-                  <input
-                    type="text"
-                    name="age"
-                    aria-label="Character Age"
-                    value={formData.age || ''}
-                    onChange={handleChange}
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-                    <Hash size={14} /> Attributes
+              <section>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider flex items-center gap-2">
+                    <Hash size={12} /> Attributes
                   </h3>
                   <button
                     onClick={() => setShowTraitLibrary(true)}
-                    className="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+                    className="text-xs text-sf-accent hover:underline"
                   >
-                    <BookOpen size={12} /> Library
+                    + Library
                   </button>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Traits (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.traits?.join(', ') || ''}
-                    onChange={handleTraitsChange}
-                    placeholder="Brave, Smart..."
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-xs text-sf-text-muted mb-1">Traits</label>
+                    <input
+                      type="text"
+                      value={formData.traits?.join(', ') || ''}
+                      onChange={handleTraitsChange}
+                      placeholder="e.g. Brave, Stubborn"
+                      className="w-full"
+                      aria-label="Traits"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-sf-text-muted mb-1">Tags</label>
+                    <input
+                      type="text"
+                      value={formData.tags?.join(', ') || ''}
+                      onChange={handleTagsChange}
+                      placeholder="e.g. Magic, Royalty"
+                      className="w-full"
+                      aria-label="Tags"
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1">
-                    Tags (comma separated)
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.tags?.join(', ') || ''}
-                    onChange={handleTagsChange}
-                    placeholder="Hero, Magic..."
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
+              </section>
             </div>
 
-            {/* Middle & Right Column: Details */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Goals & Flaws */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <Target size={14} /> Goals
+            {/* Middle & Right Column */}
+            <div className="lg:col-span-2 space-y-8">
+              <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <Target size={12} /> Goals
                   </h3>
                   <textarea
-                    aria-label="Character Goals"
                     name="goals"
-                    rows={3}
+                    rows={4}
                     value={formData.goals || ''}
                     onChange={handleChange}
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                    className="w-full resize-none"
+                    placeholder="What do they want?"
+                    aria-label="Goals"
                   />
                 </div>
-                <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                  <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                    <AlertCircle size={14} /> Flaws
+                <div>
+                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <AlertCircle size={12} /> Flaws
                   </h3>
                   <textarea
-                    aria-label="Character Flaws"
                     name="flaws"
-                    rows={3}
+                    rows={4}
                     value={formData.flaws || ''}
                     onChange={handleChange}
-                    className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                    className="w-full resize-none"
+                    placeholder="What holds them back?"
+                    aria-label="Flaws"
                   />
                 </div>
-              </div>
+              </section>
 
-              {/* Backstory */}
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <AlignLeft size={14} /> Backstory
+              <section>
+                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <AlignLeft size={12} /> Backstory
                 </h3>
                 <textarea
-                  aria-label="Character Backstory"
                   name="backstory"
-                  rows={6}
+                  rows={8}
                   value={formData.backstory || ''}
                   onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full"
+                  placeholder="Where do they come from?"
+                  aria-label="Backstory"
                 />
-              </div>
+              </section>
 
-              {/* Notes */}
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <AlignLeft size={14} /> Notes
+              <section>
+                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <AlignLeft size={12} /> Notes
                 </h3>
                 <textarea
-                  aria-label="Character Notes"
                   name="notes"
                   rows={4}
                   value={formData.notes || ''}
                   onChange={handleChange}
-                  className="w-full bg-gray-900 border border-gray-600 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full"
+                  placeholder="Additional notes..."
+                  aria-label="Notes"
                 />
-              </div>
+              </section>
 
-              {/* Relationships */}
-              <div className="bg-gray-800 p-4 rounded-lg border border-gray-700">
-                <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                  <Heart size={14} /> Relationships
+              <section>
+                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <Heart size={12} /> Relationships
                 </h3>
                 <RelationshipManager
                   characterId={character.id}
                   relationships={formData.relationships || []}
                   onUpdate={handleRelationshipsUpdate}
                 />
-              </div>
+              </section>
             </div>
           </div>
         )}
