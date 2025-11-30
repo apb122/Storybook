@@ -292,6 +292,7 @@ export interface ManuscriptComment {
   content: string;
   authorId?: EntityId; // 'user' or 'ai' or specific user id
   createdAt: Timestamp;
+  updatedAt: Timestamp;
   resolved: boolean;
   // If linked to specific text selection
   selectionRange?: {
@@ -299,6 +300,7 @@ export interface ManuscriptComment {
     to: number;
     text: string;
   };
+  position?: number;
 }
 
 /**
@@ -338,3 +340,17 @@ export interface WritingTargets {
   sessionStartWordCount: number;
   lastSessionDate: string;
 }
+
+/**
+ * Factory function to create an empty Series.
+ */
+export const createEmptySeries = (): Series => ({
+  id: crypto.randomUUID(),
+  title: '',
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  projectIds: [],
+  sharedCharacterIds: [],
+  sharedLocationIds: [],
+  tags: [],
+});
