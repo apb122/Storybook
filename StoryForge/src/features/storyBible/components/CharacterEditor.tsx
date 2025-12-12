@@ -66,7 +66,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden relative">
+    <div className="flex flex-col h-full overflow-hidden relative p-8">
       {showTraitLibrary && (
         <TraitLibrary
           onClose={() => setShowTraitLibrary(false)}
@@ -75,24 +75,24 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
         />
       )}
 
-      {/* Header */}
-      <div className="flex justify-between items-start mb-6 pb-4 border-b border-sf-border">
+      {/* Header Controls */}
+      <div className="flex justify-between items-start mb-8">
         <div>
           <input
             type="text"
             name="name"
             value={formData.name || ''}
             onChange={handleChange}
-            className="text-3xl font-bold bg-transparent border-none p-0 focus:ring-0 text-sf-text placeholder-sf-text-muted w-full"
+            className="text-4xl font-bold bg-transparent border-none p-0 focus:ring-0 text-white placeholder-gray-600 w-full mb-2"
             placeholder="Character Name"
             aria-label="Character Name"
           />
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-3">
             <select
               name="role"
               value={formData.role || 'supporting'}
               onChange={handleChange}
-              className="text-sm bg-transparent border-none p-0 text-sf-text-muted font-mono uppercase tracking-wider focus:ring-0 cursor-pointer"
+              className="text-xs font-bold uppercase tracking-wider bg-gray-800 border-none rounded px-2 py-1 text-gray-400 focus:ring-0 cursor-pointer hover:text-white transition-colors"
               aria-label="Character Role"
             >
               <option value="protagonist">Protagonist</option>
@@ -100,27 +100,27 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
               <option value="supporting">Supporting</option>
               <option value="other">Other</option>
             </select>
-            <span className="text-sf-border">|</span>
-            <span className="text-xs text-sf-text-muted">{isDirty ? 'Saving...' : 'Saved'}</span>
+            <span className="text-gray-700">|</span>
+            <span className="text-xs text-gray-500">{isDirty ? 'Saving...' : 'Saved'}</span>
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex bg-gray-800/50 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('details')}
-            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'details' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'details' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
           >
             Details
           </button>
           <button
             onClick={() => setActiveTab('network')}
-            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'network' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'network' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
           >
             Network
           </button>
           <button
             onClick={() => setActiveTab('continuity')}
-            className={`px-3 py-1 text-sm font-medium rounded-sm transition-colors ${activeTab === 'continuity' ? 'bg-sf-text text-sf-bg' : 'text-sf-text-muted hover:text-sf-text'}`}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeTab === 'continuity' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'}`}
           >
             Continuity
           </button>
@@ -128,28 +128,28 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto pr-2">
+      <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
         {activeTab === 'network' ? (
           <RelationshipGraph characterId={character.id} />
         ) : activeTab === 'continuity' ? (
           <CharacterContinuityView characterId={character.id} projectId={character.projectId} />
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 pb-12">
             {/* Left Column */}
             <div className="space-y-8">
               <section>
-                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <User size={12} /> Core Stats
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-sf-text-muted mb-1">Age</label>
+                    <label className="block text-xs text-gray-500 mb-1">Age</label>
                     <input
                       type="text"
                       name="age"
                       value={formData.age || ''}
                       onChange={handleChange}
-                      className="w-full"
+                      className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       aria-label="Age"
                     />
                   </div>
@@ -158,36 +158,36 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
 
               <section>
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider flex items-center gap-2">
                     <Hash size={12} /> Attributes
                   </h3>
                   <button
                     onClick={() => setShowTraitLibrary(true)}
-                    className="text-xs text-sf-accent hover:underline"
+                    className="text-xs text-indigo-400 hover:text-indigo-300 hover:underline"
                   >
                     + Library
                   </button>
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-sf-text-muted mb-1">Traits</label>
+                    <label className="block text-xs text-gray-500 mb-1">Traits</label>
                     <input
                       type="text"
                       value={formData.traits?.join(', ') || ''}
                       onChange={handleTraitsChange}
                       placeholder="e.g. Brave, Stubborn"
-                      className="w-full"
+                      className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       aria-label="Traits"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-sf-text-muted mb-1">Tags</label>
+                    <label className="block text-xs text-gray-500 mb-1">Tags</label>
                     <input
                       type="text"
                       value={formData.tags?.join(', ') || ''}
                       onChange={handleTagsChange}
                       placeholder="e.g. Magic, Royalty"
-                      className="w-full"
+                      className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       aria-label="Tags"
                     />
                   </div>
@@ -199,7 +199,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
             <div className="lg:col-span-2 space-y-8">
               <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
-                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Target size={12} /> Goals
                   </h3>
                   <textarea
@@ -207,13 +207,13 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
                     rows={4}
                     value={formData.goals || ''}
                     onChange={handleChange}
-                    className="w-full resize-none"
+                    className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
                     placeholder="What do they want?"
                     aria-label="Goals"
                   />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <AlertCircle size={12} /> Flaws
                   </h3>
                   <textarea
@@ -221,7 +221,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
                     rows={4}
                     value={formData.flaws || ''}
                     onChange={handleChange}
-                    className="w-full resize-none"
+                    className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 resize-none"
                     placeholder="What holds them back?"
                     aria-label="Flaws"
                   />
@@ -229,7 +229,7 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
               </section>
 
               <section>
-                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <AlignLeft size={12} /> Backstory
                 </h3>
                 <textarea
@@ -237,14 +237,14 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
                   rows={8}
                   value={formData.backstory || ''}
                   onChange={handleChange}
-                  className="w-full"
+                  className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   placeholder="Where do they come from?"
                   aria-label="Backstory"
                 />
               </section>
 
               <section>
-                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <AlignLeft size={12} /> Notes
                 </h3>
                 <textarea
@@ -252,14 +252,14 @@ export const CharacterEditor: React.FC<CharacterEditorProps> = ({ character, onS
                   rows={4}
                   value={formData.notes || ''}
                   onChange={handleChange}
-                  className="w-full"
+                  className="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm text-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                   placeholder="Additional notes..."
                   aria-label="Notes"
                 />
               </section>
 
               <section>
-                <h3 className="text-xs font-bold text-sf-text-muted uppercase tracking-wider mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <Heart size={12} /> Relationships
                 </h3>
                 <RelationshipManager

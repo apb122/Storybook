@@ -18,7 +18,7 @@ export const SignupForm: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3000/api/auth/signup', {
+      const response = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
@@ -32,8 +32,12 @@ export const SignupForm: React.FC = () => {
 
       setAuth(data.user, data.token);
       navigate('/app/dashboard');
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Signup failed');
+      }
     } finally {
       setIsLoading(false);
     }

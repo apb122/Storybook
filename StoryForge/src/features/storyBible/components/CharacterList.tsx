@@ -1,9 +1,6 @@
 import React from 'react';
 import type { Character } from '@/types/story';
 import { Search, Trash2, Plus } from 'lucide-react';
-// @ts-expect-error react-window types are incompatible with module resolution
-import { FixedSizeList as List } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
 
 interface CharacterListProps {
   characters: Character[];
@@ -98,13 +95,11 @@ export const CharacterList: React.FC<CharacterListProps> = ({
             <p>No characters found.</p>
           </div>
         ) : (
-          <AutoSizer>
-            {({ height, width }: { height: number; width: number }) => (
-              <List height={height} itemCount={characters.length} itemSize={50} width={width}>
-                {Row}
-              </List>
-            )}
-          </AutoSizer>
+          <div className="overflow-y-auto h-full">
+            {characters.map((char, index) => (
+              <Row key={char.id} index={index} style={{ height: 50 }} />
+            ))}
+          </div>
         )}
       </div>
     </div>

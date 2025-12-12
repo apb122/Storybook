@@ -12,7 +12,8 @@
     "typecheck": "tsc -b",
     "prepare": "husky",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "server": "cd server && npm run dev"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
